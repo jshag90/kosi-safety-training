@@ -1,55 +1,40 @@
 package com.kosi.entity;
 
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 @Entity
+@Table(name = "`user`")
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+   @Id
+   @Column(name = "user_id")
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private Long userId;
 
-    @NotBlank(message = "Username is mandatory")
-    private String username;
+   @Column(name = "username", length = 50, unique = true)
+   private String username;
 
-    @NotBlank(message = "Password is mandatory")
-    private String password;
+   @Column(name = "password", length = 100)
+   private String password;
 
-    private String role = "ROLE_USER"; // 기본적으로 USER 역할 부여
+   @Column(name = "nickname", length = 50)
+   private String nickname;
 
-    // Getters and Setters
+   @Column(name = "activated")
+   private boolean activated;
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
+   @ManyToMany
+   @JoinTable(
+      name = "user_authority",
+      joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+      inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
+   private Set<Authority> authorities;
 }
