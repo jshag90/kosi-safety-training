@@ -1,11 +1,16 @@
 package com.kosi.controller;
 
 import com.kosi.dto.LoginDto;
+import com.kosi.dto.RefreshTokenDto;
 import com.kosi.dto.TokenDto;
+import com.kosi.exception.ReusedRefreshTokenException;
 import com.kosi.jwt.JwtFilter;
 import com.kosi.jwt.TokenProvider;
+import com.kosi.service.UserService;
+import com.kosi.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api")
@@ -28,7 +31,11 @@ public class AuthController {
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final UserService userService;
+    private final RedisUtil redisUtil;
 
+    @Value("${jwt.refresh-token-validity-time}")
+    private long refreshTokenValidityTime;
     @PostMapping("/authenticate")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
 
@@ -49,16 +56,35 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<TokenDto> reissue(
-            @RequestBody @Valid TokenDto requestTokenDto) {
+            @RequestBody @Valid RefreshTokenDto requestTokenDto) throws ReusedRefreshTokenException {
         if (!tokenProvider.validateToken(requestTokenDto.getRefreshToken())) {
             log.info("유효하지 않은 RefreshToken 입니다");
         }
+        //이미 사용해서 blacklist에 있는 지 검사
+        if(redisUtil.hasKey(requestTokenDto.getRefreshToken())){
+            log.info("이미 사용된 refresh token, 재로그인 해야함.");
+            throw new ReusedRefreshTokenException("이미 로그아웃 된 사용자 Refresh 토큰");
+        }
+
         Authentication authentication = tokenProvider.getAuthentication(requestTokenDto.getRefreshToken());
         String accessToken = tokenProvider.createJwtToken(authentication, "access");
+        String refreshToken = tokenProvider.createJwtToken(authentication, "refresh"); //refresh 토큰도 재발급
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + accessToken);
 
-        return new ResponseEntity<>(new TokenDto(accessToken, requestTokenDto.getRefreshToken()), httpHeaders, HttpStatus.OK);
+        log.info("refresh 재사용 방지 redis 저장 : {}", requestTokenDto.getRefreshToken());
+        redisUtil.set(requestTokenDto.getRefreshToken(), authentication.getPrincipal().toString(), refreshTokenValidityTime, TimeUnit.SECONDS);
+
+        return new ResponseEntity<>(new TokenDto(accessToken, refreshToken), httpHeaders, HttpStatus.OK);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @RequestBody @Valid TokenDto requestTokenDto) {
+        userService.logout(requestTokenDto.getRefreshToken());
+        return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
+    }
+
+
 }

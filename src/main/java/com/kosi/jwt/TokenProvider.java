@@ -1,5 +1,6 @@
 package com.kosi.jwt;
 
+import com.kosi.util.RedisUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -28,11 +29,13 @@ public class TokenProvider implements InitializingBean {
    private static final String AUTHORITIES_KEY = "auth";
    @Value("${jwt.secret}")
    private String secret;
-   @Value("${jwt.token-validity-in-seconds}") //30분
-   private long tokenValidityInMilliseconds;
+   @Value("${jwt.token-validity-time}") //30분
+   private long tokenValidityTime;
 
-   @Value("${jwt.refresh-token-validity-in-seconds}")
-   private long refreshTokenValidityInMilliseconds;
+   @Value("${jwt.refresh-token-validity-time}") //7일
+   private long refreshTokenValidityTime;
+
+   private final RedisUtil redisUtil;
 
    private Key key;
 
@@ -44,12 +47,29 @@ public class TokenProvider implements InitializingBean {
 
    public String createJwtToken(Authentication authentication, String tokenType) {
       String authorities = authentication.getAuthorities().stream()
-         .map(GrantedAuthority::getAuthority)
-         .collect(Collectors.joining(","));
+              .map(GrantedAuthority::getAuthority)
+              .collect(Collectors.joining(","));
 
       long now = (new Date()).getTime();
-      long validTermTime = tokenType.equals("access") ? this.tokenValidityInMilliseconds : this.refreshTokenValidityInMilliseconds;
+      long validTermTime = tokenType.equals("access") ? this.tokenValidityTime : this.refreshTokenValidityTime;
       Date validity = new Date(now + validTermTime);
+
+      String createdToken;
+      if (tokenType.equals("refresh")) {
+         while (true) {
+            String genRT = Jwts.builder()
+                    .setSubject(authentication.getName())
+                    .claim(AUTHORITIES_KEY, authorities)
+                    .signWith(key, SignatureAlgorithm.HS512)
+                    .setExpiration(validity)
+                    .compact();
+            if (!redisUtil.hasKey(genRT)) {
+               createdToken = genRT;
+               break;
+            }
+         }
+         return createdToken;
+      }
 
       return Jwts.builder()
               .setSubject(authentication.getName())

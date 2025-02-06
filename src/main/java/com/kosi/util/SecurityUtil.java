@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @Slf4j
 public class SecurityUtil {
-
    public static Optional<String> getCurrentUsername() {
       final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
