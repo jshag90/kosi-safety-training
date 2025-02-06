@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
-	    REUSED_REFRESH_TOKEN(-2, "Refresh Token 재사용")
-	;
+    SUCCESS(0, "성공"),
+    REUSED_REFRESH_TOKEN(-2, "Refresh Token 재사용");
 
-	private int errorCode;
-	private String errorMsg;
+    private int errorCode;
+    private String errorMsg;
 }
