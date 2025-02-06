@@ -1,4 +1,4 @@
-package com.kosi;
+package com.kosi.vo;
 
 import lombok.*;
 

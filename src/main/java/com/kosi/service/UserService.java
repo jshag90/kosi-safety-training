@@ -62,6 +62,6 @@ public class UserService {
 
     public void logout(String refreshToken){
         Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-        redisUtil.set(refreshToken, authentication.getPrincipal().toString(), refreshTokenValidityTime, TimeUnit.SECONDS);
+        redisUtil.set(refreshToken, authentication.getPrincipal().toString(), refreshTokenValidityTime, TimeUnit.MILLISECONDS);
     }
 }

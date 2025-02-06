@@ -1,6 +1,6 @@
 package com.kosi.controller;
 
-import com.kosi.ResultVO;
+import com.kosi.vo.ResultVO;
 import com.kosi.dto.LoginDto;
 import com.kosi.dto.RefreshTokenDto;
 import com.kosi.dto.TokenDto;
@@ -23,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.xml.transform.Result;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -69,8 +68,8 @@ public class AuthController {
         }
         //이미 사용해서 blacklist에 있는 지 검사
         if(redisUtil.hasKey(requestTokenDto.getRefreshToken())){
-            log.info("이미 사용된 refresh token, 재로그인 해야함.");
-            throw new ReusedRefreshTokenException("이미 로그아웃 된 사용자 Refresh 토큰");
+            log.info(ErrorCode.REUSED_REFRESH_TOKEN.getErrorMsg());
+            throw new ReusedRefreshTokenException(ErrorCode.REUSED_REFRESH_TOKEN.getErrorMsg());
         }
 
         Authentication authentication = tokenProvider.getAuthentication(requestTokenDto.getRefreshToken());
@@ -81,7 +80,7 @@ public class AuthController {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + accessToken);
 
         log.info("refresh 재사용 방지 redis 저장 : {}", requestTokenDto.getRefreshToken());
-        redisUtil.set(requestTokenDto.getRefreshToken(), authentication.getPrincipal().toString(), refreshTokenValidityTime, TimeUnit.SECONDS);
+        redisUtil.set(requestTokenDto.getRefreshToken(), authentication.getPrincipal().toString(), refreshTokenValidityTime, TimeUnit.MILLISECONDS);
 
         ResultVO<TokenDto> resultVO = ResultVO.<TokenDto>builder().returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
