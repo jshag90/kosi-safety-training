@@ -20,6 +20,7 @@ public class CorsConfig {
 
       source.registerCorsConfiguration("/api/**", config);
       source.registerCorsConfiguration("/swagger-ui/**", config);
+      source.registerCorsConfiguration("/home/**", config);
       return new CorsFilter(source);
    }
 

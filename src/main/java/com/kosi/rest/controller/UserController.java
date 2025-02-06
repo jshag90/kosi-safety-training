@@ -1,4 +1,4 @@
-package com.kosi.controller;
+package com.kosi.rest.controller;
 
 import com.kosi.dto.UserDto;
 import com.kosi.service.UserService;
@@ -8,9 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")

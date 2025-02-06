@@ -1,4 +1,4 @@
-package com.kosi.controller;
+package com.kosi.rest.controller;
 
 import com.kosi.vo.ResultVO;
 import com.kosi.exception.ReusedRefreshTokenException;

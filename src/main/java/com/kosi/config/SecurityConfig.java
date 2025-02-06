@@ -1,9 +1,6 @@
 package com.kosi.config;
 
-import com.kosi.jwt.JwtAccessDeniedHandler;
-import com.kosi.jwt.JwtAuthenticationEntryPoint;
-import com.kosi.jwt.JwtSecurityConfig;
-import com.kosi.jwt.TokenProvider;
+import com.kosi.jwt.*;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -68,10 +65,12 @@ public class SecurityConfig {
                 .antMatchers("/api/signup").permitAll()
                 .antMatchers("/api/reissue").permitAll()
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs", "/webjars/**").permitAll()
+                .antMatchers("/home").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
-                .apply(new JwtSecurityConfig(tokenProvider));
+                .apply(new JwtSecurityConfig(tokenProvider))
+        ;
 
         return httpSecurity.build();
     }
