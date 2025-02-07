@@ -2,6 +2,7 @@ package com.kosi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -28,6 +29,7 @@ public class SwaggerConfig {
                 .build()
                 .securitySchemes(Collections.singletonList(apiKey()))  // 🔹 Bearer Token 인증 추가
                 .securityContexts(Collections.singletonList(securityContext())); // 🔹 보안 컨텍스트 추가
+
     }
 
     private ApiInfo apiInfo() {
