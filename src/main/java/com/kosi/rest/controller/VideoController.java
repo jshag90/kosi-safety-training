@@ -20,19 +20,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api")
 @RequiredArgsConstructor
 @Slf4j
 public class VideoController {
 
     private final VideoService videoService;
 
-    @PostMapping(value = "/upload/training-video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/upload/training-video")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "업로드할 비디오 파일", required = true,
-                    dataType = "file", paramType = "form")
-    })
     public ResponseEntity<ResultVO<Void>> uploadTrainingVideo(@RequestPart("file") MultipartFile file) throws IOException {
 
         videoService.uploadVideo(file);
