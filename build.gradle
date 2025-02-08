@@ -35,6 +35,8 @@ dependencies {
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
     implementation 'io.springfox:springfox-swagger-ui:3.0.0'
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+
+    implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
 }
 
 test {

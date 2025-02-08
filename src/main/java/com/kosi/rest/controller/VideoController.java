@@ -27,11 +27,13 @@ public class VideoController {
 
     private final VideoService videoService;
 
-    @PostMapping("/upload/training-video")
+    @PostMapping("/upload/training-video/name={name}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<ResultVO<Void>> uploadTrainingVideo(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<ResultVO<Void>> uploadTrainingVideo(
+            @PathVariable("name") String videoName,
+            @RequestPart("file") MultipartFile file) throws IOException {
 
-        videoService.uploadVideo(file);
+        videoService.uploadVideo(videoName, file);
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder().returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
