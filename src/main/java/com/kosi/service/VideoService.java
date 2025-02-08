@@ -4,6 +4,9 @@ import com.kosi.entity.Video;
 import com.kosi.repository.VideoRepository;
 import com.kosi.util.FilesUtil;
 import com.kosi.util.VideoUtil;
+import com.kosi.vo.VideoVO;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,19 +15,22 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.*;
+
+
+import static com.kosi.entity.QVideo.video;
 
 @Service
 @RequiredArgsConstructor
 public class VideoService {
 
+    private final VideoRepository videoRepository;
+    private final JPAQueryFactory jpaQueryFactory;
     @Value("${koosi.training.video}")
     private String uploadTrainingVideoPath;
 
-    private final VideoRepository videoRepository;
-
     @PostConstruct
-    public void init(){
+    public void init() {
         uploadTrainingVideoPath = FilesUtil.getPathByOS(uploadTrainingVideoPath);
     }
 
@@ -46,4 +52,15 @@ public class VideoService {
         videoRepository.save(video);
 
     }
+
+    public List<VideoVO> getVideoList() {
+        return jpaQueryFactory.select(Projections.bean(VideoVO.class
+                        , video.videoName
+                        , video.durationTime))
+                .from(video)
+                .orderBy(video.idx.desc())
+                .fetch();
+    }
+
+
 }

@@ -1,6 +1,12 @@
+buildscript {
+    ext {
+        queryDslVersion = "4.4.0"
+    }
+}
 plugins {
     id 'org.springframework.boot' version '2.5.4' // Spring Boot 2.5.x
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'com.ewerk.gradle.plugins.querydsl' version "1.0.10"
     id 'java'
     id 'war'
 }
@@ -37,6 +43,32 @@ dependencies {
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 
     implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+
+    //querydsl 추가
+
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+}
+
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+configurations {
+    querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
 }
 
 test {
