@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table
+@Table(name = "video")
 @Getter
 @Setter
 @Builder
@@ -17,9 +17,13 @@ public class Video {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idx;
 
+    @Column(nullable = false, length = 255)
     private String videoName;
 
+    @Column(length = 50)
     private String durationTime;
 
+    @Column(nullable = false, length = 500)
     private String filePath;
+
 }

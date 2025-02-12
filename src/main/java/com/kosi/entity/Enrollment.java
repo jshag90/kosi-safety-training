@@ -1,10 +1,14 @@
 package com.kosi.entity;
 
+import com.kosi.util.EnrollmentStatus;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * 어떤 사용자가 어떤 강좌를 들었고 얼마나 들었는지 확인하는 수강등록 엔티티
+ */
 @Entity
 @Table(name = "enrollment")
 @Getter
@@ -36,7 +40,4 @@ public class Enrollment {
     @Column(nullable = false)
     private EnrollmentStatus status; // 수강 상태
 
-    public enum EnrollmentStatus {
-        IN_PROGRESS, COMPLETED, CANCELED
-    }
 }

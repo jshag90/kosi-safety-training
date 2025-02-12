@@ -26,8 +26,9 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(length = 100)
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)  // Category와 관계 설정
+    private Category category; // 강좌의 카테고리
 
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
@@ -35,6 +36,12 @@ public class Course {
     @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
     private Instructor instructor;
+
+    @Column(nullable = false)
+    private Integer maxCapacity; // 강좌 최대 수용 가능 인원
+
+    @Column(nullable = false)
+    private Integer currentEnrollment; // 현재 수강 신청을 받은 인원 수
 
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -44,4 +51,5 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Lecture> lectures;
+
 }
