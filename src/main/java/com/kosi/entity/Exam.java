@@ -31,6 +31,6 @@ public class Exam {
     @Column(nullable = false)
     private LocalDate examDate;
 
-    @Column(nullable = false)
-    private Integer maxScore = 100;
+    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 100")
+    private Integer maxScore;
 }

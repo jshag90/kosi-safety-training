@@ -6,22 +6,22 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "category")
+@Table(name = "course_category")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Category {
+public class CourseCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryId;
+    private Long courseCategoryId;
 
     @Column(nullable = false, length = 100)
     private String name; // 카테고리 이름 (예: 프로그래밍, 디자인 등)
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "courseCategory", fetch = FetchType.LAZY)
     private List<Course> courses; // 해당 카테고리에 속한 강좌들
 
 }

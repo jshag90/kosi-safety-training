@@ -28,7 +28,7 @@ public class Course {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)  // Category와 관계 설정
-    private Category category; // 강좌의 카테고리
+    private CourseCategory courseCategory; // 강좌의 카테고리
 
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
