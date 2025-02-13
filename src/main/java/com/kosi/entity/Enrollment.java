@@ -22,16 +22,16 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long enrollmentId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;  // 기존 Student 대신 User 테이블 참조
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
     @Column(updatable = false)
-    private LocalDateTime enrolledAt = LocalDateTime.now();
+    private LocalDateTime enrolledAt;
 
     @Column(precision = 5, scale = 2)
     private Double progress; // 강의 진행률 (0.00 ~ 100.00)

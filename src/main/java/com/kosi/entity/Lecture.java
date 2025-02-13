@@ -18,7 +18,7 @@ public class Lecture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lectureId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
@@ -33,5 +33,5 @@ public class Lecture {
     private Integer duration; // 강의 길이(분)
 
     @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 }

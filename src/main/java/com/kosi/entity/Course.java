@@ -26,14 +26,14 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)  // Category와 관계 설정
     private Category category; // 강좌의 카테고리
 
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id", nullable = false)
     private Instructor instructor;
 
@@ -44,12 +44,12 @@ public class Course {
     private Integer currentEnrollment; // 현재 수강 신청을 받은 인원 수
 
     @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Lecture> lectures;
 
 }

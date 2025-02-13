@@ -18,16 +18,16 @@ public class Certificate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long certificateId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;  // 기존 Student 대신 User 테이블 참조
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
     @Column(updatable = false)
-    private LocalDateTime issuedAt = LocalDateTime.now();
+    private LocalDateTime issuedAt;
 
     @Column(length = 500)
     private String certificateUrl;

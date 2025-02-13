@@ -21,7 +21,7 @@ public class Category {
     @Column(nullable = false, length = 100)
     private String name; // 카테고리 이름 (예: 프로그래밍, 디자인 등)
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Course> courses; // 해당 카테고리에 속한 강좌들
 
 }
