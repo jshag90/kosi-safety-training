@@ -47,7 +47,7 @@ public class NoticeBoard {
      * 조회수 (기본값 0, NULL 불가)
      */
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0 COMMENT '조회수'")
-    private int views = 0;
+    private int views;
 
     /**
      * 공지사항 생성일 (최초 저장 시 자동 설정, 이후 변경 불가)
@@ -67,13 +67,13 @@ public class NoticeBoard {
      * 상단 고정 여부 (기본값 false, TRUE면 공지사항이 상단에 고정됨)
      */
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0 COMMENT '상단 고정 여부 (true=고정, false=일반)'")
-    private boolean isPinned = false;
+    private boolean isPinned;
 
     /**
      * 작성자
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // 기존 Student 대신 User 테이블 참조
+    private User user;
 
 }
