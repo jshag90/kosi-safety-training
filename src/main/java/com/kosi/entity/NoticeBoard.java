@@ -37,11 +37,6 @@ public class NoticeBoard {
     @Column(nullable = false, columnDefinition = "TEXT COMMENT '공지사항 내용'")
     private String content;
 
-    /**
-     * 작성자 이름 (최대 50자, NULL 불가)
-     */
-    @Column(nullable = false, length = 50, columnDefinition = "VARCHAR(50) COMMENT '작성자 이름'")
-    private String author;
 
     /**
      * 조회수 (기본값 0, NULL 불가)
