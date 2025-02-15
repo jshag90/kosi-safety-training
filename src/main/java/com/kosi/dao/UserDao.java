@@ -5,7 +5,7 @@ import static com.kosi.entity.QUserAuthority.userAuthority;
 import com.kosi.entity.Authority;
 import com.kosi.entity.User;
 import com.kosi.entity.UserAuthority;
-import com.kosi.util.QueryUtil;
+import com.kosi.util.query.UserQueryUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -42,7 +42,7 @@ public class UserDao {
     }
 
     public User saveUser(User saveUser, Authority saveAuthority) {
-        Query saveUserQuery = entityManager.createNativeQuery(QueryUtil.insertUser());
+        Query saveUserQuery = entityManager.createNativeQuery(UserQueryUtil.insertUser());
         saveUserQuery.setParameter("username", saveUser.getUsername());
         saveUserQuery.setParameter("password", saveUser.getPassword());
         saveUserQuery.setParameter("nickname", saveUser.getNickname());
@@ -51,7 +51,7 @@ public class UserDao {
 
         User insertedUser = jpaQueryFactory.selectFrom(user).orderBy(user.userId.desc()).limit(1).fetchOne();
 
-        Query saveUserAuthorityQuery = entityManager.createNativeQuery(QueryUtil.insertAuthorityQuery());
+        Query saveUserAuthorityQuery = entityManager.createNativeQuery(UserQueryUtil.insertAuthorityQuery());
         saveUserAuthorityQuery.setParameter("userId", insertedUser.getUserId());
         saveUserAuthorityQuery.setParameter("authorityName", saveAuthority.getAuthorityName());
         saveUserAuthorityQuery.executeUpdate();

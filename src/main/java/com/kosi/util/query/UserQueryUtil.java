@@ -1,6 +1,6 @@
-package com.kosi.util;
+package com.kosi.util.query;
 
-public class QueryUtil {
+public class UserQueryUtil {
 
     public static String insertUser(){
         String inserUserQuery = "INSERT INTO user (username, password, nickname, activated) VALUES (:username, :password, :nickname, :activated)";
