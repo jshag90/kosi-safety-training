@@ -61,13 +61,24 @@ public class BoardController {
 
     @PostMapping("/notice/update")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResultVO<Void>> updateNotice(@RequestBody BoardVO.UpdateNoticeVO updateNoticeVO){
+    public ResponseEntity<ResultVO<Void>> updateNotice(@RequestBody BoardVO.UpdateNoticeVO updateNoticeVO) {
 
         boardService.updateNotice(updateNoticeVO);
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .build();
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping("/notice/find-one/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<ResultVO<BoardVO.FindOneNoticeVO>> findOneNotice(@PathVariable("id") Long id) {
+        ResultVO<BoardVO.FindOneNoticeVO> resultVO = ResultVO.<BoardVO.FindOneNoticeVO>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(boardService.findOneNotice(id))
                 .build();
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }

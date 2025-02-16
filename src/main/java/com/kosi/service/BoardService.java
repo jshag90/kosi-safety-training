@@ -71,4 +71,8 @@ public class BoardService {
         boardDao.updateNotice(updateNoticeVO);
     }
 
+    public BoardVO.FindOneNoticeVO findOneNotice(Long id){
+        return boardDao.findOneNotice(id);
+    }
+
 }

@@ -26,4 +26,15 @@ public class BoardVO {
         String content;
         List<Long> uploadFileIds;
     }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class FindOneNoticeVO {
+        String title;
+        String content;
+        List<String> fileNames;
+    }
 }

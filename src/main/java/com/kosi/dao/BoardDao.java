@@ -168,4 +168,16 @@ public class BoardDao {
         }
     }
 
+    public BoardVO.FindOneNoticeVO findOneNotice(Long id) {
+        BoardVO.FindOneNoticeVO findOneNoticeVO = jpaQueryFactory.select(Projections.bean(BoardVO.FindOneNoticeVO.class
+                        , noticeBoard.title
+                        , noticeBoard.content
+                )).from(noticeBoard)
+                .where(noticeBoard.id.eq(id)).fetchOne();
+
+        findOneNoticeVO.setFileNames(jpaQueryFactory.select(uploadFiles.fileName).from(uploadFiles)
+                                                    .where(uploadFiles.postId.eq(id)).fetch());
+
+        return findOneNoticeVO;
+    }
 }
