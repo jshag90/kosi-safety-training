@@ -1,8 +1,9 @@
 package com.kosi.dao;
 
 import com.kosi.dto.NoticeDto;
-import com.kosi.entity.NoticeBoard;
+import com.kosi.entity.UploadFiles;
 import com.kosi.entity.User;
+import com.kosi.util.FilesUtil;
 import com.kosi.util.SecurityUtil;
 import com.kosi.util.UploadFileType;
 import com.kosi.util.query.BoardFileQueryUtil;
@@ -10,19 +11,24 @@ import com.kosi.util.query.BoardQueryUtil;
 import com.kosi.vo.BoardVO;
 import com.kosi.vo.DataTablesRequest;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.kosi.entity.QNoticeBoard.noticeBoard;
+import static com.kosi.entity.QUploadFiles.uploadFiles;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,6 +38,14 @@ public class BoardDao {
     private final UserDao userDao;
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Value("${koosi.board.notice.file}")
+    private String updateNoticeFilePath;
+
+    @PostConstruct
+    public void init() {
+        updateNoticeFilePath = FilesUtil.getPathByOS(updateNoticeFilePath);
+    }
 
     public List<NoticeDto> getNoticeList(DataTablesRequest dataTablesRequest) {
         return jpaQueryFactory.select(
@@ -75,15 +89,65 @@ public class BoardDao {
                 .fetchOne().getId();
     }
 
-    public void saveNoticeUploadFiles(Long postId, List<MultipartFile> files, List<String> fileReNameList) {
+    public void saveNoticeUploadFiles(Long postId, Optional<List<MultipartFile>> files, List<String> fileReNameList) {
         int nameIndex = 0;
-        for (MultipartFile file : files) {
-            Query saveBoardFileQuery = entityManager.createNativeQuery(BoardFileQueryUtil.insertBoardFile());
-            saveBoardFileQuery.setParameter("fileName", file.getOriginalFilename());
-            saveBoardFileQuery.setParameter("fileReName", fileReNameList.get(nameIndex++));
-            saveBoardFileQuery.setParameter("postIdx", postId);
-            saveBoardFileQuery.setParameter("uploadFileType", UploadFileType.NOTICE.name());
-            saveBoardFileQuery.executeUpdate();
+        if(files.isPresent()) {
+            for (MultipartFile file : files.get()) {
+                Query saveBoardFileQuery = entityManager.createNativeQuery(BoardFileQueryUtil.insertBoardFile());
+                saveBoardFileQuery.setParameter("fileName", file.getOriginalFilename());
+                saveBoardFileQuery.setParameter("fileReName", fileReNameList.get(nameIndex++));
+                saveBoardFileQuery.setParameter("postId", postId);
+                saveBoardFileQuery.setParameter("uploadFileType", UploadFileType.NOTICE.name());
+                saveBoardFileQuery.executeUpdate();
+            }
+        }
+    }
+
+    public void updateNotice(BoardVO.UpdateNoticeVO updateNoticeVO) {
+
+        jpaQueryFactory.update(noticeBoard)
+                .set(noticeBoard.title, updateNoticeVO.getTitle())
+                .set(noticeBoard.content, updateNoticeVO.getContent())
+                .where(noticeBoard.id.eq(updateNoticeVO.getId()))
+                .execute();
+
+        //수정 시 첨부파일 모두 지울 경우
+        BooleanExpression noticeFileAllWhereQuery = uploadFiles.postId.eq(updateNoticeVO.getId()).and(uploadFiles.uploadFileType.eq(UploadFileType.NOTICE));
+        if (updateNoticeVO.getUploadFileIds().size() < 1) {
+            List<UploadFiles> uploadFilesList = jpaQueryFactory.select(Projections.bean(UploadFiles.class, uploadFiles.fileReName))
+                                                                .from(uploadFiles)
+                                                                .where(noticeFileAllWhereQuery)
+                                                                .fetch();
+            deleteFileByUploadFileList(uploadFilesList);
+
+            jpaQueryFactory.delete(uploadFiles).where(noticeFileAllWhereQuery).execute();
+            return;
+        }
+
+        //수정 시 첨부파일을 일부만 지웠을 경우
+        BooleanExpression noticeFileSomeWhereQuery = noticeFileAllWhereQuery.and(uploadFiles.id.notIn(updateNoticeVO.getUploadFileIds()));
+        if (updateNoticeVO.getUploadFileIds().size() != jpaQueryFactory.selectFrom(uploadFiles).where(noticeFileAllWhereQuery).fetch().size()) {
+            List<UploadFiles> uploadFilesList = jpaQueryFactory.select(Projections.bean(UploadFiles.class, uploadFiles.fileReName))
+                                                                .from(uploadFiles)
+                                                                .where(noticeFileSomeWhereQuery)
+                                                                .fetch();
+            deleteFileByUploadFileList(uploadFilesList);
+
+            jpaQueryFactory.delete(uploadFiles).where(noticeFileSomeWhereQuery).execute();
+        }
+
+    }
+
+    /**
+     * 공지사항 첨부 실제 파일 삭제
+     * @param uploadFilesList
+     */
+    private void deleteFileByUploadFileList(List<UploadFiles> uploadFilesList) {
+        for (UploadFiles uploadFile : uploadFilesList) {
+            File deleteFilePath = new File(updateNoticeFilePath + "/" + uploadFile.getFileReName());
+            if (deleteFilePath.exists()) {
+                deleteFilePath.delete();
+            }
         }
     }
 

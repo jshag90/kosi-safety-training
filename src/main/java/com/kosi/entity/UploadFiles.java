@@ -17,13 +17,13 @@ public class UploadFiles {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idx;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UploadFileType uploadFileType; // 수강 상태
 
-    private Long postIdx;
+    private Long postId;
 
     private String fileName;
 

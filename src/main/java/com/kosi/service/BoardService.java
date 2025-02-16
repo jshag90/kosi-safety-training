@@ -35,14 +35,14 @@ public class BoardService {
     }
 
     @Transactional
-    public void saveNotice(BoardVO.SaveNoticeVO saveNoticeVO, List<MultipartFile> files) throws IOException {
+    public void saveNotice(BoardVO.SaveNoticeVO saveNoticeVO, Optional<List<MultipartFile>> files) throws IOException {
 
         Long saveNoticeId = boardDao.saveNotice(saveNoticeVO);
 
         //첨부파일 저장
         List<String> fileReNameList = new ArrayList<>();
-        if(files.size() > 0) {
-            for(MultipartFile file : files) {
+        if(files.isPresent() && files.get().size() > 0) {
+            for(MultipartFile file : files.get()) {
                 File uploadPath = new File(updateNoticeFilePath);
                 if (!uploadPath.exists()) {
                     uploadPath.mkdirs(); // 디렉토리 생성
@@ -55,6 +55,11 @@ public class BoardService {
         }
 
         boardDao.saveNoticeUploadFiles(saveNoticeId, files, fileReNameList);
+    }
+
+    @Transactional
+    public void updateNotice(BoardVO.UpdateNoticeVO updateNoticeVO) {
+        boardDao.updateNotice(updateNoticeVO);
     }
 
 }

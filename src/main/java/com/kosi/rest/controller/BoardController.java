@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -42,15 +43,27 @@ public class BoardController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<ResultVO<Void>> saveNotice(@RequestParam("title") String title,
                                                      @RequestParam("content") String content,
-                                                     @RequestPart(value = "files", required = false) List<MultipartFile> files
+                                                     @RequestPart(value = "files", required = false) Optional<List<MultipartFile>> files
     ) throws IOException {
-        log.info(files.toString());
-
         BoardVO.SaveNoticeVO saveNoticeVO = BoardVO.SaveNoticeVO.builder()
                 .title(title)
                 .content(content)
                 .build();
+
         boardService.saveNotice(saveNoticeVO, files);
+
+        ResultVO<Void> resultVO = ResultVO.<Void>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .build();
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @PostMapping("/notice/update")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ResultVO<Void>> updateNotice(@RequestBody BoardVO.UpdateNoticeVO updateNoticeVO){
+
+        boardService.updateNotice(updateNoticeVO);
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
