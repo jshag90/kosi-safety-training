@@ -31,7 +31,16 @@ public class BoardService {
     }
 
     public List<NoticeDto> getNoticeList(DataTablesRequest dataTablesRequest) {
-        return boardDao.getNoticeList(dataTablesRequest);
+        List<NoticeDto> noticeList = boardDao.getNoticeList(dataTablesRequest);
+        Long totalCount = boardDao.getTotalByNoticeList(dataTablesRequest);
+
+        //행번호 필드 초기화
+        int rowNum = totalCount.intValue() - dataTablesRequest.getOffset();
+        for(NoticeDto noticeDto : noticeList){
+            noticeDto.setRownum(String.valueOf(rowNum--));
+        }
+
+        return noticeList;
     }
 
     @Transactional

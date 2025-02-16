@@ -55,7 +55,7 @@ public class BoardDao {
                                                             .where(uploadFiles.uploadFileType.eq(UploadFileType.NOTICE)
                                                                     .and(uploadFiles.postId.eq(noticeBoard.id)))
                                                             .exists();
-
+        //TODO 검새조건에 따라서 where절 처리해야함
         return jpaQueryFactory.select(
                         Projections.bean(NoticeDto.class,
                                 noticeBoard.id,
@@ -65,17 +65,21 @@ public class BoardDao {
                                 Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.createdAt, "%Y-%m-%d %H:%i:%s").as("createdAt"),
                                 Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.updatedAt, "%Y-%m-%d %H:%i:%s").as("updatedAt"),
                                 noticeBoard.isPinned,
-                                user.nickname.as("author"), // INNER JOIN 이후 user.nickname을 조회
+                                user.nickname.as("author"),
                                 isExistsUploadFile.as("hasUploadFile")
                         )
                 )
                 .from(noticeBoard)
-                .innerJoin(user).on(noticeBoard.user.userId.eq(user.userId))  // INNER JOIN 추가
+                .innerJoin(user).on(noticeBoard.user.userId.eq(user.userId))
                 .limit(dataTablesRequest.getPgSize())
                 .offset(dataTablesRequest.getOffset())
                 .orderBy(noticeBoard.createdAt.desc())
                 .fetch();
+    }
 
+    public Long getTotalByNoticeList(DataTablesRequest dataTablesRequest){
+        //TODO 검새조건에 따라서 where절 처리해야함
+        return jpaQueryFactory.selectFrom(noticeBoard).fetchCount();
     }
 
     public Long saveNotice(BoardVO.SaveNoticeVO saveNoticeVO) {
