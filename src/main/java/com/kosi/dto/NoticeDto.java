@@ -15,4 +15,5 @@ public class NoticeDto extends DataTablesResponseDto {
     String updatedAt;
     boolean isPinned;
     String author;
+    boolean hasUploadFile; //첨부파일이 있는 게시물인지
 }

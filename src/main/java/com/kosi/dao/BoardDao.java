@@ -13,6 +13,7 @@ import com.kosi.vo.DataTablesRequest;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import java.util.*;
 
 import static com.kosi.entity.QNoticeBoard.noticeBoard;
 import static com.kosi.entity.QUploadFiles.uploadFiles;
+import static com.kosi.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -48,21 +50,32 @@ public class BoardDao {
     }
 
     public List<NoticeDto> getNoticeList(DataTablesRequest dataTablesRequest) {
+        BooleanExpression isExistsUploadFile = JPAExpressions.selectOne()
+                                                            .from(uploadFiles)
+                                                            .where(uploadFiles.uploadFileType.eq(UploadFileType.NOTICE)
+                                                                    .and(uploadFiles.postId.eq(noticeBoard.id)))
+                                                            .exists();
+
         return jpaQueryFactory.select(
-                        Projections.bean(NoticeDto.class, noticeBoard.id
-                                , noticeBoard.title
-                                , noticeBoard.content
-                                , noticeBoard.views
-                                , Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.createdAt, "%Y-%m-%d %H:%i:%s").as("createdAt")
-                                , Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.updatedAt, "%Y-%m-%d %H:%i:%s").as("updatedAt")
-                                , noticeBoard.isPinned
-                                , noticeBoard.user.nickname.as("author")
+                        Projections.bean(NoticeDto.class,
+                                noticeBoard.id,
+                                noticeBoard.title,
+                                noticeBoard.content,
+                                noticeBoard.views,
+                                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.createdAt, "%Y-%m-%d %H:%i:%s").as("createdAt"),
+                                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.updatedAt, "%Y-%m-%d %H:%i:%s").as("updatedAt"),
+                                noticeBoard.isPinned,
+                                user.nickname.as("author"), // INNER JOIN 이후 user.nickname을 조회
+                                isExistsUploadFile.as("hasUploadFile")
                         )
-                ).from(noticeBoard)
+                )
+                .from(noticeBoard)
+                .innerJoin(user).on(noticeBoard.user.userId.eq(user.userId))  // INNER JOIN 추가
                 .limit(dataTablesRequest.getPgSize())
                 .offset(dataTablesRequest.getOffset())
                 .orderBy(noticeBoard.createdAt.desc())
                 .fetch();
+
     }
 
     public Long saveNotice(BoardVO.SaveNoticeVO saveNoticeVO) {
