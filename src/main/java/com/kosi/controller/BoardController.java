@@ -10,6 +10,6 @@ public class BoardController {
 
     @GetMapping("/notice/list")
     public String noticePage(){
-        return "/board/list";
+        return "/board/notice/list";
     }
 }
