@@ -1,5 +1,6 @@
 package com.kosi.rest.controller;
 
+import com.kosi.dto.ListResp;
 import com.kosi.dto.NoticeDto;
 import com.kosi.service.BoardService;
 import com.kosi.util.ErrorCode;
@@ -24,14 +25,14 @@ import java.util.Optional;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
-public class BoardController {
+public class BoardRestController {
 
     private final BoardService boardService;
 
     @PostMapping("/notice/list")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<ResultVO<List<NoticeDto>>> getNoticeList(@RequestBody DataTablesRequest dataTablesRequest) {
-        ResultVO<List<NoticeDto>> resultVO = ResultVO.<List<NoticeDto>>builder()
+    public ResponseEntity<ResultVO<ListResp<NoticeDto>>> getNoticeList(@RequestBody DataTablesRequest dataTablesRequest) {
+        log.info(String.valueOf(dataTablesRequest));
+        ResultVO<ListResp<NoticeDto>> resultVO = ResultVO.<ListResp<NoticeDto>>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
                 .data(boardService.getNoticeList(dataTablesRequest))

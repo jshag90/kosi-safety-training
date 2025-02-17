@@ -55,7 +55,7 @@ public class BoardDao {
                                                             .where(uploadFiles.uploadFileType.eq(UploadFileType.NOTICE)
                                                                     .and(uploadFiles.postId.eq(noticeBoard.id)))
                                                             .exists();
-        //TODO 검새조건에 따라서 where절 처리해야함
+
         return jpaQueryFactory.select(
                         Projections.bean(NoticeDto.class,
                                 noticeBoard.id,
@@ -72,14 +72,29 @@ public class BoardDao {
                 .from(noticeBoard)
                 .innerJoin(user).on(noticeBoard.user.userId.eq(user.userId))
                 .limit(dataTablesRequest.getPgSize())
+                .where(getNoticeWhereQuery(dataTablesRequest))
                 .offset(dataTablesRequest.getOffset())
                 .orderBy(noticeBoard.createdAt.desc())
                 .fetch();
     }
 
+    private static BooleanExpression getNoticeWhereQuery(DataTablesRequest dataTablesRequest) {
+        BooleanExpression whereQuery = null;
+        switch (dataTablesRequest.getSearchField()) {
+            case "title":
+                whereQuery = noticeBoard.title.contains(dataTablesRequest.getSearchWord());
+                break;
+            case "author":
+                whereQuery = user.nickname.contains(dataTablesRequest.getSearchWord());
+                break;
+            default:
+                break;
+        }
+        return whereQuery;
+    }
+
     public Long getTotalByNoticeList(DataTablesRequest dataTablesRequest){
-        //TODO 검새조건에 따라서 where절 처리해야함
-        return jpaQueryFactory.selectFrom(noticeBoard).fetchCount();
+        return jpaQueryFactory.selectFrom(noticeBoard).where(getNoticeWhereQuery(dataTablesRequest)).fetchCount();
     }
 
     public Long saveNotice(BoardVO.SaveNoticeVO saveNoticeVO) {

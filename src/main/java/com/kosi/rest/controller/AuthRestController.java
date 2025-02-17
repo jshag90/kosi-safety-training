@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
-public class AuthController {
+public class AuthRestController {
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;

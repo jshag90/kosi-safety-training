@@ -1,19 +1,12 @@
 package com.kosi.rest.controller;
 
-import com.kosi.entity.Video;
 import com.kosi.service.VideoService;
 import com.kosi.util.ErrorCode;
 import com.kosi.vo.ResultVO;
 import com.kosi.vo.VideoVO;
-import io.swagger.annotations.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +19,7 @@ import java.util.List;
 @RequestMapping(value = "/api")
 @RequiredArgsConstructor
 @Slf4j
-public class VideoController {
+public class VideoRestController {
 
     private final VideoService videoService;
 

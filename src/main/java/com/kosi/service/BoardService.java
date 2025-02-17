@@ -1,6 +1,7 @@
 package com.kosi.service;
 
 import com.kosi.dao.BoardDao;
+import com.kosi.dto.ListResp;
 import com.kosi.dto.NoticeDto;
 import com.kosi.util.FilesUtil;
 import com.kosi.vo.BoardVO;
@@ -30,7 +31,7 @@ public class BoardService {
         updateNoticeFilePath = FilesUtil.getPathByOS(updateNoticeFilePath);
     }
 
-    public List<NoticeDto> getNoticeList(DataTablesRequest dataTablesRequest) {
+    public ListResp<NoticeDto> getNoticeList(DataTablesRequest dataTablesRequest) {
         List<NoticeDto> noticeList = boardDao.getNoticeList(dataTablesRequest);
         Long totalCount = boardDao.getTotalByNoticeList(dataTablesRequest);
 
@@ -39,8 +40,12 @@ public class BoardService {
         for(NoticeDto noticeDto : noticeList){
             noticeDto.setRownum(String.valueOf(rowNum--));
         }
-
-        return noticeList;
+        return ListResp.<NoticeDto>builder()
+                .list(noticeList)
+                .total(totalCount.intValue())
+                .currPg(dataTablesRequest.getPg())
+                .lastPg((totalCount.intValue()/dataTablesRequest.getPgSize())+1)
+                .build();
     }
 
     @Transactional
