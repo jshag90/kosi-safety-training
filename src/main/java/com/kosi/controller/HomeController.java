@@ -20,5 +20,10 @@ public class HomeController {
         model.addAttribute("message", "Hello, Spring MVC!");
         return "home";
     }
+
+    @GetMapping("/")
+    public String index(){
+        return "index";
+    }
 }
 
