@@ -20,8 +20,8 @@
     <div class="container px-4 px-lg-5 mt-4 mb-5">
         <div class="row">
 
-             <%@include file ="../sidebar.jsp" %>
-            
+           <%@include file ="../sidebar.jsp" %>
+
             <!-- 메인 콘텐츠 -->
             <main class="col-md-10">
                 <h2>공지사항</h2>
@@ -118,13 +118,13 @@
                     },
                     { data: "author" },
                     { data: "views" },
-                    { 
+                    {
                         data: "createdAt",
                         render: function (data) {
                             return new Date(data).toLocaleString('ko-KR');
                         }
                     },
-                    { 
+                    {
                         data: "hasUploadFile",
                         render: function (data) {
                             return data ? "📎 있음" : "❌ 없음";
@@ -163,7 +163,7 @@
                 showMonthAfterYear: true,
                 yearSuffix: '년'
             });
-            //실행  
+            //실행
             $(function () {
                 $('#datepick').datepicker();
             });

@@ -9,7 +9,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class BoardController {
 
     @GetMapping("/notice/list")
-    public String noticePage(){
+    public String noticePage() {
         return "/board/notice/list";
     }
+
+    @GetMapping("/faq/list")
+    public String faqPage() {
+        return "/board/faq/list";
+    }
+
+    @GetMapping("/qna/list")
+    public String qnaPage() {
+        return "/board/qna/list";
+    }
+
 }

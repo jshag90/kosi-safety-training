@@ -87,8 +87,8 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="noticeDropdown">
                 <li><a class="dropdown-item" href="${contextPath}/board/notice/list">공지사항</a></li>
-                <li><a class="dropdown-item" href="#!">자주하는 질문</a></li>
-                <li><a class="dropdown-item" href="#!">Q&A</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/board/faq/list">자주하는 질문</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/board/qna/list">Q&A</a></li>
               </ul>
             </li>
             <!-- 마이페이지 -->

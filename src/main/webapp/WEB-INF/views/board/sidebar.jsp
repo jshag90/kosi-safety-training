@@ -19,10 +19,10 @@
                             <a class="nav-link" href="${contextPath}/board/notice/list">공지사항</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">자주하는 질문</a>
+                            <a class="nav-link" href="${contextPath}/board/faq/list">자주하는 질문</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Q&A</a>
+                            <a class="nav-link" href="${contextPath}/board/qna/list">Q&A</a>
                         </li>
                     </ul>
                 </li>
