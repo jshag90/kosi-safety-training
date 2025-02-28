@@ -19,27 +19,7 @@
     <div class="container px-4 px-lg-5 mt-4">
         <div class="row">
 
-            <!-- 왼쪽 사이드바 -->
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-                <div class="position-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <span class="nav-link fw-bold text-dark">알림마당</span> <!-- 서브메뉴 헤더 -->
-                            <ul class="nav flex-column ms-3"> <!-- 하위 항목 -->
-                                <li class="nav-item">
-                                    <a class="nav-link active" href="#">공지사항</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">자주하는 질문</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Q&A</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            <%@include file ="./sidebar.jsp" %>
             
             <!-- 메인 콘텐츠 -->
             <main class="col-md-10">
