@@ -86,7 +86,7 @@
                 알림마당
               </a>
               <ul class="dropdown-menu" aria-labelledby="noticeDropdown">
-                <li><a class="dropdown-item" href="#!">공지사항</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/board/notice/list">공지사항</a></li>
                 <li><a class="dropdown-item" href="#!">자주하는 질문</a></li>
                 <li><a class="dropdown-item" href="#!">Q&A</a></li>
               </ul>
