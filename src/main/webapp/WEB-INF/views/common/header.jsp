@@ -22,6 +22,8 @@
     />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link rel="stylesheet" href="${contextPath}/css/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-white">
@@ -110,12 +112,12 @@
     
 
         <!-- 로그인 모달 -->
-      <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="loginModalLabel">로그인</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()"></button>
             </div>
             <div class="modal-body">
               <form>
@@ -131,7 +133,7 @@
                 </div>
                 <!-- 로그인 버튼 -->
                 <div class="d-grid mb-3">
-                  <button type="submit" class="btn btn-primary">로그인</button>
+                  <button type="button" class="btn btn-primary" onclick="loginAuthentication()">로그인</button>
                 </div>
               </form>
               <!-- 회원가입 | 아이디 찾기 | 비밀번호 찾기 -->
@@ -153,5 +155,47 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS-->
     <script src="${contextPath}/js/scripts.js"></script>
+
+    <script>
+
+    $(document).ready(function () {
+
+        $("#loginModal").on("hide.bs.modal", function () {
+          $("button, input, select, textarea").each(function () {
+            $(this).blur();
+          });
+        });
+
+    });
+
+    function closeModal() {
+        $("#loginModal").modal("hide"); // 모달 닫기
+    }
+
+    function loginAuthentication() {
+
+        const loginData = {
+            username: $('#loginId').val(),
+            password: $('#loginPassword').val()
+        };
+
+        axios.post("${contextPath}/api/authenticate", loginData)
+            .then(response => {
+                alert('로그인 성공');
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 401) {
+                    alert('아이디(이메일) 또는 비밀번호가 일치하지 않습니다.');
+                } else {
+                    console.error('Error sending data:', error);
+                    alert('로그인 중 오류가 발생했습니다.');
+                }
+          });
+
+    }
+
+
+
+    </script>
   </body>
 </html>
