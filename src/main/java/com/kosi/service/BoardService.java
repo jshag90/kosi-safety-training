@@ -1,6 +1,7 @@
 package com.kosi.service;
 
 import com.kosi.dao.BoardDao;
+import com.kosi.dto.FaqDto;
 import com.kosi.dto.ListResp;
 import com.kosi.dto.NoticeDto;
 import com.kosi.util.FilesUtil;
@@ -80,4 +81,23 @@ public class BoardService {
         return boardDao.findOneNotice(id);
     }
 
+    public ListResp<FaqDto> getFaqList(DataTablesRequest dataTablesRequest) {
+
+        List<FaqDto> faqList = boardDao.getFaqList(dataTablesRequest);
+        Long totalCount = boardDao.getTotalByFaqList(dataTablesRequest);
+
+        //행번호 필드 초기화
+        int rowNum = totalCount.intValue() - dataTablesRequest.getOffset();
+        for(FaqDto faqDto : faqList){
+            faqDto.setRownum(String.valueOf(rowNum--));
+        }
+
+        return ListResp.<FaqDto>builder()
+                .list(faqList)
+                .total(totalCount.intValue())
+                .currPg(dataTablesRequest.getPg())
+                .lastPg((totalCount.intValue()/dataTablesRequest.getPgSize())+1)
+                .build();
+
+    }
 }

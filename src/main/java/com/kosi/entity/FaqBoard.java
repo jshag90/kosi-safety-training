@@ -19,6 +19,9 @@ public class FaqBoard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // FAQ 항목의 고유 식별자
 
+    @ManyToOne
+    private FaqType faqTypeBoard;
+
     @Column(nullable = false)
     private String question;  // FAQ 질문 내용
 
@@ -27,11 +30,5 @@ public class FaqBoard {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;  // FAQ 항목 생성 시간
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;  // FAQ 항목 최종 수정 시간
-
-    @Column(name = "is_published", nullable = false)
-    private boolean isPublished;  // FAQ 항목 공개 여부 (true: 공개, false: 비공개)
 
 }

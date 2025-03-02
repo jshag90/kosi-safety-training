@@ -7,4 +7,8 @@ public class BoardFileQueryUtil {
                 "VALUES(:fileName, :fileReName, :postId, :uploadFileType)";
     }
 
+    public static String insertFaqType(){
+        return "INSERT INTO faq_type(faq_type_text) VALUES(:faqTypeText)";
+    }
+
 }

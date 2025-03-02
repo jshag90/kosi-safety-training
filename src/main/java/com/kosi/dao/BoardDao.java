@@ -1,8 +1,10 @@
 package com.kosi.dao;
 
+import com.kosi.dto.FaqDto;
 import com.kosi.dto.NoticeDto;
 import com.kosi.entity.UploadFiles;
 import com.kosi.entity.User;
+import com.kosi.util.FaqTypeText;
 import com.kosi.util.FilesUtil;
 import com.kosi.util.SecurityUtil;
 import com.kosi.util.UploadFileType;
@@ -17,7 +19,9 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +33,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.kosi.entity.QNoticeBoard.noticeBoard;
+import static com.kosi.entity.QFaqBoard.faqBoard;
+import static com.kosi.entity.QFaqType.faqType;
 import static com.kosi.entity.QUploadFiles.uploadFiles;
 import static com.kosi.entity.QUser.user;
 
@@ -195,4 +201,37 @@ public class BoardDao {
 
         return findOneNoticeVO;
     }
+
+    public List<FaqDto> getFaqList(DataTablesRequest dataTablesRequest) {
+        return jpaQueryFactory.select(
+                        Projections.bean(FaqDto.class,
+                                faqBoard.id,
+                                faqType.faqTypeText,
+                                faqBoard.question
+                        )
+                )
+                .from(faqBoard)
+                .innerJoin(faqType).on(faqBoard.faqTypeBoard.id.eq(faqBoard.faqTypeBoard.id))
+                .limit(dataTablesRequest.getPgSize())
+                .offset(dataTablesRequest.getOffset())
+                .orderBy(faqBoard.createdAt.desc())
+                .fetch();
+    }
+
+
+    public Long getTotalByFaqList(DataTablesRequest dataTablesRequest){
+        return jpaQueryFactory.selectFrom(faqBoard).fetchCount();
+    }
+
+    @Transactional
+    public void insertFaqType() {
+        if (jpaQueryFactory.selectFrom(faqType).fetchCount() < 1) {
+            Query saveFaqTypeQuery = entityManager.createNativeQuery(BoardFileQueryUtil.insertFaqType());
+            for (FaqTypeText type : FaqTypeText.values()) {
+                saveFaqTypeQuery.setParameter("faqTypeText", type.getFaqTypeText());
+                saveFaqTypeQuery.executeUpdate();
+            }
+        }
+    }
+
 }

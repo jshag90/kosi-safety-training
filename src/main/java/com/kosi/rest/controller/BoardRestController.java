@@ -1,5 +1,6 @@
 package com.kosi.rest.controller;
 
+import com.kosi.dto.FaqDto;
 import com.kosi.dto.ListResp;
 import com.kosi.dto.NoticeDto;
 import com.kosi.service.BoardService;
@@ -83,5 +84,17 @@ public class BoardRestController {
                 .build();
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
+
+    @PostMapping("/faq/list")
+    public ResponseEntity<ResultVO<ListResp<FaqDto>>> getFaqList(@RequestBody DataTablesRequest dataTablesRequest) {
+        log.info(String.valueOf(dataTablesRequest));
+        ResultVO<ListResp<FaqDto>> resultVO = ResultVO.<ListResp<FaqDto>>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(boardService.getFaqList(dataTablesRequest))
+                .build();
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
 
 }
