@@ -48,9 +48,9 @@
                             <button type="button" id="searchBtn" class="btn btn-primary w-100">검색</button>
                         </div>
                     </form>
-                </div> <br/>
-                <table id="faqTable" class="display" style="width:100%">
-                </table>
+                    <br/>
+                    <table id="faqTable" class="display" style="width:100%"></table>
+                </div> 
             </main>
         </div>
     </div>
@@ -61,7 +61,7 @@
         var ctx = "${contextPath}";
         $(document).ready(function () {
 
-        $('#searchField').val('ALL'); // 기본 선택값 설정
+        $('#searchField').val('ALL');
 
         let table = $('#faqTable').DataTable({
             processing: true,
@@ -95,13 +95,15 @@
                     data: "rownum",
                     render: function (data, type, row) {
                         return "Q "+row.rownum+".";
-                    } 
+                    },
+                    width: "10%" 
                 },
                 {
                     data: "question",
                     render: function (data, type, row) {
                         return "<span class='question-text' data-id='"+row.id+"' style='cursor: pointer; color: blue; text-decoration: underline;'>"+row.question+"</span>";
-                    }
+                    },
+                    width: "90%"
                 }
             ],
             language: {
