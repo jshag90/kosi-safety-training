@@ -48,19 +48,21 @@
                             <button type="button" id="searchBtn" class="btn btn-primary w-100">검색</button>
                         </div>
                     </form>
-                </div> <br/>
-                <table id="noticeTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>번호</th>
-                            <th>제목</th>
-                            <th>작성자</th>
-                            <th>조회수</th>
-                            <th>등록일</th>
-                            <th>첨부파일</th>
-                        </tr>
-                    </thead>
-                </table>
+                    <br/>
+                    <table id="noticeTable" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th>제목</th>
+                                <th>작성자</th>
+                                <th>조회수</th>
+                                <th>등록일</th>
+                                <th>첨부파일</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                
             </main>
         </div>
     </div>
