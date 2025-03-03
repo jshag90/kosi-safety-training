@@ -148,6 +148,13 @@
             $('#searchBtn').on('click', function () {
                 table.ajax.reload();
             });
+
+            $('#searchWord').on('keypress', function (e) {
+                if (e.which === 13) { // Enter 키 코드
+                    e.preventDefault(); // 기본 이벤트 방지
+                    $('#searchBtn').click(); // 검색 버튼 클릭 이벤트 호출
+                }
+            });
         });
 
         function datepickEvt(){

@@ -19,8 +19,9 @@ public class FaqBoard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // FAQ 항목의 고유 식별자
 
-    @ManyToOne
-    private FaqType faqTypeBoard;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "faq_type_id", nullable = false)
+    private FaqType faqType;
 
     @Column(nullable = false)
     private String question;  // FAQ 질문 내용

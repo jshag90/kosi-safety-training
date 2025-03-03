@@ -1,5 +1,6 @@
 package com.kosi.rest.controller;
 
+import com.kosi.dto.FaqAnswerDto;
 import com.kosi.dto.FaqDto;
 import com.kosi.dto.ListResp;
 import com.kosi.dto.NoticeDto;
@@ -92,6 +93,16 @@ public class BoardRestController {
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
                 .data(boardService.getFaqList(dataTablesRequest))
+                .build();
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping("/faq/find-one/answer/{id}")
+    public ResponseEntity<ResultVO<FaqAnswerDto>> getAnswerById(@PathVariable("id") Long id){
+        ResultVO<FaqAnswerDto> resultVO = ResultVO.<FaqAnswerDto>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(boardService.getFaqAnswerById(id))
                 .build();
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }

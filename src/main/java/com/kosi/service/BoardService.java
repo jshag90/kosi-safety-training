@@ -1,6 +1,7 @@
 package com.kosi.service;
 
 import com.kosi.dao.BoardDao;
+import com.kosi.dto.FaqAnswerDto;
 import com.kosi.dto.FaqDto;
 import com.kosi.dto.ListResp;
 import com.kosi.dto.NoticeDto;
@@ -100,4 +101,9 @@ public class BoardService {
                 .build();
 
     }
+
+    public FaqAnswerDto getFaqAnswerById(Long id) {
+        return boardDao.getFaqAnswerById(id);
+    }
+
 }

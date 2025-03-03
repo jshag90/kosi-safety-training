@@ -28,17 +28,11 @@
                 <div class="border-top border-default my-4"></div>
                 <div class="container mt-4">
                     <form class="row g-2">
-                        <div class="col-md-2">
-                            <input type="text" id="startDate" class="form-control datepicker" placeholder="시작일">
-                        </div>
-                        <div class="col-md-2">
-                            <input type="text" id="endDate" class="form-control datepicker" placeholder="종료일">
-                        </div>
                         <div class="col-md-2"></div>
                         <div class="col-md-2">
                             <select id="searchField" class="form-select">
-                                <option value="title">제목</option>
-                                <option value="author">작성자</option>
+                                <option value="ALL">전체</option>
+                                <option value="결제/환불">결제/환불</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -49,15 +43,11 @@
                         </div>
                     </form>
                 </div> <br/>
-                <table id="noticeTable" class="display" style="width:100%">
+                <table id="faqTable" class="display" style="width:100%">
                     <thead>
                         <tr>
                             <th>번호</th>
-                            <th>제목</th>
-                            <th>작성자</th>
-                            <th>조회수</th>
-                            <th>등록일</th>
-                            <th>첨부파일</th>
+                            <th>질문</th>
                         </tr>
                     </thead>
                 </table>
@@ -81,13 +71,13 @@
             });
 
 
-            let table = $('#noticeTable').DataTable({
+            let table = $('#faqTable').DataTable({
                 processing: true,
                 serverSide: true,
                 searching: false,
                 ordering: false,
                 ajax: {
-                    url: ctx+"/api/notice/list",
+                    url: ctx+"/api/faq/list",
                     type: "POST",
                     contentType: "application/json; charset=UTF-8",
                     data: function (d) {
@@ -100,7 +90,7 @@
                     },
                     dataSrc: function (json) {
                         if (json.returnCode !== 0) {
-                            alert("공지사항 데이터를 불러오는 데 실패했습니다.");
+                            alert("FAQ 데이터를 불러오는 데 실패했습니다.");
                             return [];
                         }
                         json.recordsTotal = json.data.total;
@@ -111,23 +101,9 @@
                 columns: [
                     { data: "rownum" },
                     {
-                        data: "title",
+                        data: "question",
                         render: function (data, type, row) {
-                            return row.title ? `<a href="${ctx}/notice/detail/${row.id}">${row.title}</a>` : "제목 없음";
-                        }
-                    },
-                    { data: "author" },
-                    { data: "views" },
-                    {
-                        data: "createdAt",
-                        render: function (data) {
-                            return new Date(data).toLocaleString('ko-KR');
-                        }
-                    },
-                    {
-                        data: "hasUploadFile",
-                        render: function (data) {
-                            return data ? "📎 있음" : "❌ 없음";
+                            return row.question;
                         }
                     }
                 ],

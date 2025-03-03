@@ -1,10 +1,10 @@
 package com.kosi.dao;
 
+import com.kosi.dto.FaqAnswerDto;
 import com.kosi.dto.FaqDto;
 import com.kosi.dto.NoticeDto;
 import com.kosi.entity.UploadFiles;
 import com.kosi.entity.User;
-import com.kosi.util.FaqTypeText;
 import com.kosi.util.FilesUtil;
 import com.kosi.util.SecurityUtil;
 import com.kosi.util.UploadFileType;
@@ -19,10 +19,10 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.kosi.util.FaqTypeText;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -203,15 +203,32 @@ public class BoardDao {
     }
 
     public List<FaqDto> getFaqList(DataTablesRequest dataTablesRequest) {
+
+        BooleanExpression whereQuery = null;
+        if (!dataTablesRequest.getSearchField().equals("ALL")) {
+            whereQuery = faqBoard.faqType.faqTypeText.eq(dataTablesRequest.getSearchWord());
+        }
+
+        if(!dataTablesRequest.getSearchWord().isEmpty()){
+            if( whereQuery != null) {
+                whereQuery.and(faqBoard.answer.contains(dataTablesRequest.getSearchWord()))
+                        .or(faqBoard.question.contains(dataTablesRequest.getSearchWord()));
+            } else {
+                whereQuery = faqBoard.answer.contains(dataTablesRequest.getSearchWord())
+                        .or(faqBoard.question.contains(dataTablesRequest.getSearchWord()));
+            }
+        }
+
         return jpaQueryFactory.select(
                         Projections.bean(FaqDto.class,
                                 faqBoard.id,
-                                faqType.faqTypeText,
+                                faqBoard.faqType.faqTypeText,
                                 faqBoard.question
                         )
                 )
                 .from(faqBoard)
-                .innerJoin(faqType).on(faqBoard.faqTypeBoard.id.eq(faqBoard.faqTypeBoard.id))
+                .innerJoin(faqType).on(faqBoard.faqType.id.eq(faqType.id))
+                .where(whereQuery)
                 .limit(dataTablesRequest.getPgSize())
                 .offset(dataTablesRequest.getOffset())
                 .orderBy(faqBoard.createdAt.desc())
@@ -220,7 +237,21 @@ public class BoardDao {
 
 
     public Long getTotalByFaqList(DataTablesRequest dataTablesRequest){
-        return jpaQueryFactory.selectFrom(faqBoard).fetchCount();
+        BooleanExpression whereQuery = null;
+        if (!dataTablesRequest.getSearchField().equals("ALL")) {
+            whereQuery = faqBoard.faqType.faqTypeText.eq(dataTablesRequest.getSearchWord());
+        }
+
+        if(!dataTablesRequest.getSearchWord().isEmpty()){
+            if( whereQuery != null) {
+                whereQuery.and(faqBoard.answer.contains(dataTablesRequest.getSearchWord()))
+                        .or(faqBoard.question.contains(dataTablesRequest.getSearchWord()));
+            } else {
+                whereQuery = faqBoard.answer.contains(dataTablesRequest.getSearchWord())
+                        .or(faqBoard.question.contains(dataTablesRequest.getSearchWord()));
+            }
+        }
+        return jpaQueryFactory.selectFrom(faqBoard).where(whereQuery).fetchCount();
     }
 
     @Transactional
@@ -232,6 +263,14 @@ public class BoardDao {
                 saveFaqTypeQuery.executeUpdate();
             }
         }
+    }
+
+    public FaqAnswerDto getFaqAnswerById(Long id) {
+        return jpaQueryFactory.select(Projections.bean(
+                        FaqAnswerDto.class, faqBoard.answer))
+                .from(faqBoard)
+                .where(faqBoard.id.eq(id))
+                .fetchOne();
     }
 
 }

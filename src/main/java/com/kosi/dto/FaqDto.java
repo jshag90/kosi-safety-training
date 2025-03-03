@@ -1,6 +1,5 @@
 package com.kosi.dto;
 
-import com.kosi.util.FaqTypeText;
 import lombok.*;
 
 @Getter
@@ -12,7 +11,6 @@ public class FaqDto extends DataTablesResponseDto {
     Long id;
     String faqTypeText;
     String question;
-
 }
 
 
