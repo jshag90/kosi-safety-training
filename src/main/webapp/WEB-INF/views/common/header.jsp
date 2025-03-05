@@ -28,7 +28,7 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-white">
       <div class="container px-5">
-        <a class="navbar-brand" style="color: black" href="#!"
+        <a class="navbar-brand" style="color: black" href="http://www.koosi.kr/"
           >한국안전원(주)</a
         >
         <button
@@ -55,7 +55,7 @@
     </nav>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container px-5">
-        <a class="navbar-brand" href="#">한국안전원(주) 에듀센터</a>
+        <a class="navbar-brand" href="${contextPath}/">한국안전원(주) 에듀센터</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
           aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -103,6 +103,7 @@
                 <li><a class="dropdown-item" href="#!">수강신청내역</a></li>
                 <li><a class="dropdown-item" href="#!">수료증발급</a></li>
                 <li><a class="dropdown-item" href="#!">개인정보수정</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/save">교육과정등록</a></li>
               </ul>
             </li>
           </ul>
