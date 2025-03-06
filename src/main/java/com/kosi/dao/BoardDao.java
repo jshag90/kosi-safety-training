@@ -257,7 +257,7 @@ public class BoardDao {
     @Transactional
     public void insertFaqType() {
         if (jpaQueryFactory.selectFrom(faqType).fetchCount() < 1) {
-            Query saveFaqTypeQuery = entityManager.createNativeQuery(BoardFileQueryUtil.insertFaqType());
+            Query saveFaqTypeQuery = entityManager.createNativeQuery(BoardQueryUtil.insertFaqType());
             for (FaqTypeText type : FaqTypeText.values()) {
                 saveFaqTypeQuery.setParameter("faqTypeText", type.getFaqTypeText());
                 saveFaqTypeQuery.executeUpdate();
