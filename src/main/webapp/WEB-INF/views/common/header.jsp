@@ -14,16 +14,14 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>한국안전원(주) 에듀센터</title>
-    <!-- Favicon-->
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="${contextPath}/assets/favicon.ico"
-    />
-    <!-- Core theme CSS (includes Bootstrap)-->
+    <link rel="icon" type="image/x-icon" href="${contextPath}/assets/favicon.ico"/>
     <link rel="stylesheet" href="${contextPath}/css/styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/i18n/datepicker-ko.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-white">
