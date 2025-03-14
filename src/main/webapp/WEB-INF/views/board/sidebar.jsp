@@ -13,16 +13,16 @@
         <div class="position-sticky">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <span class="nav-link fw-bold text-dark">알림마당</span> <!-- 서브메뉴 헤더 -->
+                    <span class="nav-link fw-bold text-dark">커뮤니티</span> <!-- 서브메뉴 헤더 -->
                     <ul class="nav flex-column ms-3"> <!-- 하위 항목 -->
                         <li class="nav-item">
                             <a class="nav-link" href="${contextPath}/board/notice/list">공지사항</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="${contextPath}/board/faq/list">자주하는 질문</a>
+                            <a class="nav-link" href="${contextPath}/board/qna/list">문의사항</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="${contextPath}/board/qna/list">Q&A</a>
+                            <a class="nav-link" href="${contextPath}/board/brc/list">사업자등록증 다운로드</a>
                         </li>
                     </ul>
                 </li>
