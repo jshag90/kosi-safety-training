@@ -13,14 +13,23 @@ public class BoardController {
         return "/board/notice/list";
     }
 
-    @GetMapping("/faq/list")
-    public String faqPage() {
-        return "/board/faq/list";
-    }
-
     @GetMapping("/qna/list")
     public String qnaPage() {
         return "/board/qna/list";
+    }
+
+    /**
+     * Business Registration Certificate
+     * @return
+     */
+    @GetMapping("/brc/list")
+    public String brcPage() {
+        return "/board/brc/list";
+    }
+
+    @GetMapping("/faq/list")
+    public String faqPage() {
+        return "/board/faq/list";
     }
 
 }

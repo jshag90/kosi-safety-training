@@ -22,6 +22,16 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/i18n/datepicker-ko.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+     
+    <style>
+      .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+      }
+      .dropdown-menu {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-white">
@@ -51,57 +61,67 @@
 
       </div>
     </nav>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container px-5">
-        <a class="navbar-brand" href="${contextPath}/">한국안전원(주) 에듀센터</a>
+        <a class="navbar-brand me-5" href="${contextPath}/">한국안전원(주) 에듀센터</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
           aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <!-- 집체교육 -->
+          <ul class="navbar-nav w-100 d-flex justify-content-between">
+            <!-- 집체교육 메뉴 -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="groupTrainingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                집체교육
+                <b>집체교육</b>
               </a>
               <ul class="dropdown-menu" aria-labelledby="groupTrainingDropdown">
                 <li><a class="dropdown-item" href="#!">집체교육 소개</a></li>
                 <li><a class="dropdown-item" href="#!">수강안내 및 신청</a></li>
+                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a></li>
+                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a></li>
               </ul>
             </li>
-            <!-- 인터넷 교육 -->
+    
+            <!-- 인터넷 교육 메뉴 -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="onlineTrainingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                인터넷 교육
+                <b>인터넷 교육</b>
               </a>
               <ul class="dropdown-menu" aria-labelledby="onlineTrainingDropdown">
                 <li><a class="dropdown-item" href="#!">인터넷 교육소개</a></li>
-                <li><a class="dropdown-item" href="#!">근로자 정기교육</a></li>
+                <li><a class="dropdown-item" href="#!">수강안내 및 신청</a></li>
+                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 근로자 정기교육</a></li>
+                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 채용 시 교육</a></li>
+                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 작업내용 변경 시 교육</a></li>
+                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a></li>
+                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a></li>
               </ul>
             </li>
-            <!-- 알림마당 -->
+    
+            <!-- 커뮤니티 메뉴 -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="noticeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                알림마당
+                <b>커뮤니티</b>
               </a>
               <ul class="dropdown-menu" aria-labelledby="noticeDropdown">
                 <li><a class="dropdown-item" href="${contextPath}/board/notice/list">공지사항</a></li>
-                <li><a class="dropdown-item" href="${contextPath}/board/faq/list">자주하는 질문</a></li>
-                <li><a class="dropdown-item" href="${contextPath}/board/qna/list">Q&A</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/board/qna/list">문의사항</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/board/brc/list">사업자등록증 다운로드</a></li>
               </ul>
             </li>
-            <!-- 마이페이지 -->
+    
+            <!-- 마이페이지 메뉴 -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="mypageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                마이페이지
+                <b>마이페이지</b>
               </a>
               <ul class="dropdown-menu" aria-labelledby="mypageDropdown">
-                <li><a class="dropdown-item" href="#!">내 강의보기</a></li>
-                <li><a class="dropdown-item" href="#!">수강신청내역</a></li>
-                <li><a class="dropdown-item" href="#!">수료증발급</a></li>
                 <li><a class="dropdown-item" href="#!">개인정보수정</a></li>
-                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/save">교육과정등록</a></li>
+                <li><a class="dropdown-item" href="#!">나의 강의실</a></li>
+                <li><a class="dropdown-item" href="#!">수강신청 내역</a></li>
+                <li><a class="dropdown-item" href="#!">수료증발급</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/save">교육과정등록(관리자용)</a></li>
               </ul>
             </li>
           </ul>
