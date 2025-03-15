@@ -1,13 +1,14 @@
 package com.kosi.service;
 
 import com.kosi.dao.UserDao;
-import com.kosi.dto.UserDto;
+import com.kosi.dto.MemberDto;
 import com.kosi.entity.Authority;
 import com.kosi.entity.User;
 import com.kosi.exception.DuplicateMemberException;
 import com.kosi.jwt.TokenProvider;
 import com.kosi.util.RedisUtil;
 import com.kosi.util.SecurityUtil;
+import com.kosi.vo.MemberVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -30,33 +31,25 @@ public class UserService {
     private long refreshTokenValidityTime;
 
     @Transactional
-    public UserDto signup(UserDto userDto) {
-        if (userDao.findOneByUsername(userDto.getUsername()).orElse(null) != null) {
+    public MemberDto signup(MemberVO memberVo) {
+        if (userDao.findOneByUsername(memberVo.getUsername()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
         }
 
-        Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
-                .build();
+        Authority authority = Authority.builder().authorityName("ROLE_USER").build();
 
-        User user = User.builder()
-                .username(userDto.getUsername())
-                .password(passwordEncoder.encode(userDto.getPassword()))
-                .nickname(userDto.getNickname())
-                .activated(true)
-                .build();
-
-        return UserDto.from(userDao.saveUser(user, authority));
+        User savedMember = userDao.saveUser(memberVo, authority);
+        return MemberDto.from(savedMember);
     }
 
     @Transactional(readOnly = true)
-    public UserDto getUserWithAuthorities(String username) {
-        return UserDto.from(userDao.findOneByUsername(username).orElse(null));
+    public MemberDto getUserWithAuthorities(String username) {
+        return MemberDto.from(userDao.findOneByUsername(username).orElse(null));
     }
 
     @Transactional(readOnly = true)
-    public UserDto getMyUserWithAuthorities() {
-        return UserDto.from(SecurityUtil.getCurrentUsername().flatMap(userDao::findOneByUsername).orElse(null));
+    public MemberDto getMyUserWithAuthorities() {
+        return MemberDto.from(SecurityUtil.getCurrentUsername().flatMap(userDao::findOneByUsername).orElse(null));
     }
 
     public void logout(String refreshToken){

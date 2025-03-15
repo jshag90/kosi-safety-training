@@ -55,7 +55,7 @@
            <a class="nav-link" style="color: black" data-bs-toggle="modal" data-bs-target="#loginModal">로그인</a>
          </li>
          <li class="nav-item">
-           <a class="nav-link" style="color: black" href="#!">회원가입</a>
+           <a class="nav-link" style="color: black" href="${contextPath}/member/sign-up">회원가입</a>
          </li>
        </div>
 
@@ -157,7 +157,7 @@
               </form>
               <!-- 회원가입 | 아이디 찾기 | 비밀번호 찾기 -->
               <div class="d-flex justify-content-between">
-                <a href="#!" class="text-decoration-none small">회원가입</a>
+                <a href="${contextPath}/member/sign-up" class="text-decoration-none small">회원가입</a>
                 <span class="text-muted small">|</span>
                 <a href="#!" class="text-decoration-none small">아이디 찾기</a>
                 <span class="text-muted small">|</span>

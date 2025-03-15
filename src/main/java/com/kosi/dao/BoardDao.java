@@ -71,7 +71,7 @@ public class BoardDao {
                                 Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.createdAt, "%Y-%m-%d %H:%i:%s").as("createdAt"),
                                 Expressions.stringTemplate("DATE_FORMAT({0}, {1})", noticeBoard.updatedAt, "%Y-%m-%d %H:%i:%s").as("updatedAt"),
                                 noticeBoard.isPinned,
-                                user.nickname.as("author"),
+                                user.name.as("author"),
                                 isExistsUploadFile.as("hasUploadFile")
                         )
                 )
@@ -91,7 +91,7 @@ public class BoardDao {
                 whereQuery = noticeBoard.title.contains(dataTablesRequest.getSearchWord());
                 break;
             case "author":
-                whereQuery = user.nickname.contains(dataTablesRequest.getSearchWord());
+                whereQuery = user.name.contains(dataTablesRequest.getSearchWord());
                 break;
             default:
                 break;

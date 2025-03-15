@@ -6,8 +6,10 @@ import com.kosi.entity.Authority;
 import com.kosi.entity.User;
 import com.kosi.entity.UserAuthority;
 import com.kosi.util.query.UserQueryUtil;
+import com.kosi.vo.MemberVO;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,7 +22,7 @@ import java.util.Optional;
 public class UserDao {
 
     private final JPAQueryFactory jpaQueryFactory;
-
+    private final PasswordEncoder passwordEncoder;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -41,12 +43,19 @@ public class UserDao {
                 .fetch();
     }
 
-    public User saveUser(User saveUser, Authority saveAuthority) {
+    public User saveUser(MemberVO memberVO, Authority saveAuthority) {
         Query saveUserQuery = entityManager.createNativeQuery(UserQueryUtil.insertUser());
-        saveUserQuery.setParameter("username", saveUser.getUsername());
-        saveUserQuery.setParameter("password", saveUser.getPassword());
-        saveUserQuery.setParameter("nickname", saveUser.getNickname());
-        saveUserQuery.setParameter("activated", saveUser.isActivated());
+        saveUserQuery.setParameter("activated", 1);
+        saveUserQuery.setParameter("password", passwordEncoder.encode(memberVO.getPassword()));
+        saveUserQuery.setParameter("userName", memberVO.getUsername());
+        saveUserQuery.setParameter("agreePersonalInfoCollection", 1);
+        saveUserQuery.setParameter("agreePersonalInfoThirdPart", 1);
+        saveUserQuery.setParameter("birthday", memberVO.getBirthday());
+        saveUserQuery.setParameter("email", memberVO.getEmail());
+        saveUserQuery.setParameter("phoneNumber", memberVO.getPhoneNumber());
+        saveUserQuery.setParameter("name", memberVO.getName());
+        saveUserQuery.setParameter("companyName", memberVO.getCompanyName());
+        saveUserQuery.setParameter("companyNumber", memberVO.getCompanyNumber());
         saveUserQuery.executeUpdate();
 
         User insertedUser = jpaQueryFactory.selectFrom(user).orderBy(user.userId.desc()).limit(1).fetchOne();

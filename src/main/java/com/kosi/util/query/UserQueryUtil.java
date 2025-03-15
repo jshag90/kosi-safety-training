@@ -2,14 +2,32 @@ package com.kosi.util.query;
 
 public class UserQueryUtil {
 
+
     public static String insertUser(){
-        String inserUserQuery = "INSERT INTO user (username, password, nickname, activated) VALUES (:username, :password, :nickname, :activated)";
-        return inserUserQuery;
+       return "INSERT INTO user (" +
+                                                "  activated" +
+                                                ", password" +
+                                                ", username" +
+                                                ", agree_personal_info_collection" +
+                                                ", agree_personal_info_third_party" +
+                                                ", birthday" +
+                                                ", email" +
+                                                ", phone_number" +
+                                                ", name" +
+                                                ", company_name" +
+                                                ", company_number) " +
+                "VALUES ( :activated, :password, :userName, :agreePersonalInfoCollection, :agreePersonalInfoThirdPart" +
+                ", :birthday" +
+                ", :email" +
+                ", :phoneNumber" +
+                ", :name" +
+                ", :companyName" +
+                ", :companyNumber" +
+                ")";
     }
 
     public static String insertAuthorityQuery(){
-        String insertUserAuthorityQuery = "INSERT INTO user_authority (user_id, authority_name) VALUES (:userId, :authorityName)";
-        return insertUserAuthorityQuery;
+        return "INSERT INTO user_authority (user_id, authority_name) VALUES (:userId, :authorityName)";
     }
 
 }

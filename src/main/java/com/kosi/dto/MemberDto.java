@@ -7,14 +7,13 @@ import com.kosi.entity.User;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class MemberDto {
 
    @NotNull
    @Size(min = 3, max = 50)
@@ -27,16 +26,28 @@ public class UserDto {
 
    @NotNull
    @Size(min = 3, max = 50)
-   private String nickname;
+   private String name;
+
+   @NotNull
+   @Size(min = 1)
+   private String email;
+
+   private String birthday;
+
+   private String phoneNumber;
+
+   private String companyName;
+
+   private String companyNumber;
 
    private Set<AuthorityDto> authorityDtoSet;
 
-   public static UserDto from(User user) {
+   public static MemberDto from(User user) {
       if(user == null) return null;
 
-      return UserDto.builder()
+      return MemberDto.builder()
               .username(user.getUsername())
-              .nickname(user.getNickname())
+              .name(user.getName())
     /*          .authorityDtoSet(user.getAuthorities().stream()
                       .map(authority -> AuthorityDto.builder().authorityName(authority.getAuthorityName()).build())
                       .collect(Collectors.toSet()))*/
