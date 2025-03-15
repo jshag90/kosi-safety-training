@@ -46,7 +46,7 @@ public class UserDao {
     public User saveUser(MemberVO memberVO, Authority saveAuthority) {
         Query saveUserQuery = entityManager.createNativeQuery(UserQueryUtil.insertUser());
         saveUserQuery.setParameter("activated", 1);
-        saveUserQuery.setParameter("password", passwordEncoder.encode(memberVO.getPassword()));
+        saveUserQuery.setParameter("password", memberVO.getPassword());
         saveUserQuery.setParameter("userName", memberVO.getUsername());
         saveUserQuery.setParameter("agreePersonalInfoCollection", 1);
         saveUserQuery.setParameter("agreePersonalInfoThirdPart", 1);
@@ -59,14 +59,13 @@ public class UserDao {
         saveUserQuery.executeUpdate();
 
         User insertedUser = jpaQueryFactory.selectFrom(user).orderBy(user.userId.desc()).limit(1).fetchOne();
+        Long userId = insertedUser.getUserId();
 
         Query saveUserAuthorityQuery = entityManager.createNativeQuery(UserQueryUtil.insertAuthorityQuery());
-        saveUserAuthorityQuery.setParameter("userId", insertedUser.getUserId());
+        saveUserAuthorityQuery.setParameter("userId", userId);
         saveUserAuthorityQuery.setParameter("authorityName", saveAuthority.getAuthorityName());
         saveUserAuthorityQuery.executeUpdate();
-
         return insertedUser;
-
     }
 
 

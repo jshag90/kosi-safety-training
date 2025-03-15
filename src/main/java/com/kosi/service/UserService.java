@@ -31,14 +31,15 @@ public class UserService {
     private long refreshTokenValidityTime;
 
     @Transactional
-    public MemberDto signup(MemberVO memberVo) {
-        if (userDao.findOneByUsername(memberVo.getUsername()).orElse(null) != null) {
+    public MemberDto signup(MemberVO memberVO) {
+        if (userDao.findOneByUsername(memberVO.getUsername()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
         }
 
+        memberVO.setPassword(passwordEncoder.encode(memberVO.getPassword()));
         Authority authority = Authority.builder().authorityName("ROLE_USER").build();
 
-        User savedMember = userDao.saveUser(memberVo, authority);
+        User savedMember = userDao.saveUser(memberVO, authority);
         return MemberDto.from(savedMember);
     }
 
