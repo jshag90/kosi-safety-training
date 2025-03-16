@@ -155,8 +155,12 @@
                 </div>
                 <!-- 로그인 버튼 -->
                 <div class="d-grid mb-3">
-                  <button type="button" class="btn btn-primary" onclick="loginAuthentication()">로그인</button>
+                  <button id="loginBtn" type="button" class="btn btn-primary" onclick="loginAuthentication()">
+                    <span id="loginSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    로그인
+                  </button>
                 </div>
+
               </form>
               <!-- 회원가입 | 아이디 찾기 | 비밀번호 찾기 -->
               <div class="d-flex justify-content-between">
@@ -186,6 +190,19 @@
           });
         });
 
+        const accessToken = sessionStorage.getItem("accessToken");
+        if (accessToken) {
+          $('#authLinks').children().hide();
+          $('#authLinks').html(`
+              <li class="nav-item">
+                  <span class="nav-link" style="color: black">`+sessionStorage.getItem("userName")+`님</span>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" style="color: black" href="#" onclick="logout()">로그아웃</a>
+              </li>
+          `);
+        }
+
     });
 
     function closeModal() {
@@ -194,47 +211,62 @@
 
     function loginAuthentication() {
 
+        var $btn = $("#loginBtn");
+        var $spinner = $("#loginSpinner");
+
+        // 버튼 비활성화 및 로딩 스피너 표시
+        $btn.prop("disabled", true);
+        $spinner.removeClass("d-none");
+
+
         const loginData = {
             username: $('#loginId').val(),
             password: $('#loginPassword').val()
         };
 
-        axios.post("${contextPath}/api/authenticate", loginData, { withCredentials: true })
+        axios.post("${contextPath}/api/authenticate", loginData)
             .then(response => {
 
-                Swal.fire({
-                title: '로그인',
-                text: '로그인이 완료되었습니다.',
-                icon: 'success',
-                confirmButtonText: '완료',
-                backdrop: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                      // Update the navigation bar to show "로그아웃"
-                      $('#authLinks').children().hide();
-                      $('#authLinks').html(`
-                      <li class="nav-item">
-                        <a class="nav-link" style="color: black" href="#" onclick="logout()">로그아웃</a>
-                        </li>
-                        `);
+              console.log("Login Response:", response); // Debugging log
 
-                      closeModal();
-                    }
-                });
+              const accessToken = response.data.data.accessToken;
+              console.log("Access Token:", accessToken); // Debugging log
+
+              sessionStorage.setItem("accessToken", accessToken);
+
+              closeModal();
+              getUserInfo();
 
             })
             .catch(error => {
                 if (error.response && error.response.status === 401) {
-                    alert('아이디(이메일) 또는 비밀번호가 일치하지 않습니다.');
+                    Swal.fire({
+                      title: '아이디 또는 비밀번호가 일치하지 않습니다.',
+                      icon: 'error',
+                      confirmButtonText: '확인',
+                      didClose: () => {
+                          $('#loginId').focus();
+                      }
+                    });
                 } else {
-                    console.error('Error sending data:', error);
-                    alert('로그인 중 오류가 발생했습니다.');
+                   Swal.fire({
+                      title: '로그인 중 오류가 발생했습니다.',
+                      icon: 'error',
+                      confirmButtonText: '확인',
+                      didClose: () => {
+                          $('#loginId').focus();
+                      }
+                    });
                 }
+          })
+          .finally(() => {
+            $btn.prop("disabled", false);
+            $spinner.addClass("d-none");
           });
-
     }
 
     function logout() {
+        sessionStorage.removeItem("accessToken");
         axios.post("${contextPath}/api/logout", {}, { withCredentials: true })
             .then(response => {
                 Swal.fire({
@@ -244,18 +276,15 @@
                     confirmButtonText: '완료',
                     backdrop: false
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Update the navigation bar to show "로그인" and "회원가입"
-                        $('#authLinks').children().hide();
-                        $('#authLinks').html(`
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: black" data-bs-toggle="modal" data-bs-target="#loginModal">로그인</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: black" href="${contextPath}/member/sign-up">회원가입</a>
-                            </li>
-                        `);
-                    }
+                  $('#authLinks').children().hide();
+                  $('#authLinks').html(`
+                      <li class="nav-item">
+                          <a class="nav-link" style="color: black" data-bs-toggle="modal" data-bs-target="#loginModal">로그인</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link" style="color: black" href="${contextPath}/member/sign-up">회원가입</a>
+                      </li>
+                  `);
                 });
             })
             .catch(error => {
@@ -263,6 +292,47 @@
                 alert('로그아웃 중 오류가 발생했습니다.');
             });
     }
+
+    function getUserInfo() {
+    const accessToken = sessionStorage.getItem("accessToken");
+
+    if (!accessToken) {
+        alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+        return;
+    }
+
+    axios.get("${contextPath}/api/user", {
+        headers: {"Authorization": ` Bearer `+accessToken}
+    })
+    .then(response => {
+        console.log("User Info:", response.data);
+        const userName = response.data.name; // 사용자 이름을 받아옵니다.
+        console.log("User Info:", userName);
+        sessionStorage.setItem("userName", userName); // 사용자 이름을 세션 스토리지에 저장합니다.
+        // #authLinks 안의 기존 내용을 숨기고, 로그인 후 사용자 이름과 로그아웃 버튼을 표시합니다.
+        $('#authLinks').children().hide();
+        $('#authLinks').html(`
+            <li class="nav-item">
+                <span class="nav-link" style="color: black">`+userName+`님</span>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" style="color: black" href="#" onclick="logout()">로그아웃</a>
+            </li>
+        `);
+    })
+    .catch(error => {
+        if (error.response) {
+            if (error.response.status === 401) {
+                alert("인증이 필요합니다. 로그인해주세요.");
+            } else {
+                console.error("Error:", error.response.data);
+            }
+        } else {
+            console.error("Error:", error);
+            alert("서버와의 연결에 실패했습니다.");
+        }
+    });
+}
 
     </script>
   </body>

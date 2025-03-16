@@ -27,7 +27,7 @@ public class UserRestController {
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<MemberDto> getMyUserInfo(HttpServletRequest request) {
+    public ResponseEntity<MemberDto> getMyUserInfo() {
         return ResponseEntity.ok(userService.getMyUserWithAuthorities());
     }
 

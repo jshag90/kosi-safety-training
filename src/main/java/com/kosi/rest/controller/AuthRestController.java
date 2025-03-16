@@ -53,32 +53,14 @@ public class AuthRestController {
         String accessToken = tokenProvider.createJwtToken(authentication, "access");
         String refreshToken = tokenProvider.createJwtToken(authentication, "refresh");
 
-        HttpHeaders httpHeaders = initCookieByToken(accessToken, refreshToken);
+        HttpHeaders httpHeaders = initCookieByRefreshToken(refreshToken);
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + accessToken);
 
         ResultVO<TokenDto> resultVO = ResultVO.<TokenDto>builder().returnCode(ErrorCode.SUCCESS.getErrorCode())
-                                            .msg(ErrorCode.SUCCESS.getErrorMsg())
-                                            .data(new TokenDto(accessToken, refreshToken))
-                                            .build();
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(new TokenDto(accessToken, ""))
+                .build();
         return new ResponseEntity<>(resultVO, httpHeaders, HttpStatus.OK);
-    }
-
-    private static HttpHeaders initCookieByToken(String accessToken, String refreshToken) {
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
-        accessTokenCookie.setSecure(true); // HTTPS에서만 쿠키가 전송됨
-        accessTokenCookie.setPath("/"); // 전체 경로에 대해 유효
-        accessTokenCookie.setMaxAge(60 * 60); // 1시간
-
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Set-Cookie", createCookieString(accessTokenCookie));
-        httpHeaders.add("Set-Cookie", createCookieString(refreshTokenCookie));
-        return httpHeaders;
     }
 
     @PostMapping("/reissue")
@@ -97,8 +79,7 @@ public class AuthRestController {
         String accessToken = tokenProvider.createJwtToken(authentication, "access");
         String refreshToken = tokenProvider.createJwtToken(authentication, "refresh"); //refresh 토큰도 재발급
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + accessToken);
+        HttpHeaders httpHeaders = initCookieByRefreshToken(refreshToken);
 
         log.info("refresh 재사용 방지 redis 저장 : {}", requestTokenDto.getRefreshToken());
         redisUtil.set(requestTokenDto.getRefreshToken(), authentication.getPrincipal().toString(), refreshTokenValidityTime, TimeUnit.MILLISECONDS);
@@ -110,13 +91,22 @@ public class AuthRestController {
         return new ResponseEntity<>(resultVO, httpHeaders, HttpStatus.OK);
     }
 
+    private static HttpHeaders initCookieByRefreshToken(String refreshToken) {
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Set-Cookie", createCookieString(refreshTokenCookie));
+        return httpHeaders;
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<ResultVO<Void>> logout(
-            @CookieValue(value = "refreshToken", defaultValue = "") String refreshToken,
-            @CookieValue(value = "accessToken", defaultValue = "") String accessToken) {
-
-        TokenDto requestTokenDto = new TokenDto(accessToken, refreshToken);
-        userService.logout(requestTokenDto.getRefreshToken());
+            @CookieValue("refreshToken") String refreshToken) {
+        userService.logout(refreshToken);
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder().returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
