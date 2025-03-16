@@ -98,7 +98,7 @@
     const phoneRegex = /^01[0-9]-\d{3,4}-\d{4}$/;
     const companyPhoneRegex = /^(01[0-9]-\d{3,4}-\d{4}|0\d{1,2}-\d{3,4}-\d{4})$/;
     const nameRegex = /^[가-힣a-zA-Z]+$/;
-    const nonWhitespaceRegex = /\S/;
+    const invalidCompanyNameRegex = /^[가-힣a-zA-Z!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|-]+$/;
 
     $(document).ready(function() {
         $('#password').on('input', function() {
@@ -283,7 +283,7 @@
             return;
         }
 
-        if (!nonWhitespaceRegex.test(companyName)) {
+        if (!invalidCompanyNameRegex.test(companyName)) {
             Swal.fire({
                 title: '회사명에는 공백이 포함될 수 없습니다.',
                 icon: 'error',
