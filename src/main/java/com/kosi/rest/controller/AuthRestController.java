@@ -22,8 +22,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
+
+import static com.kosi.util.SecurityUtil.createCookieString;
 
 @RestController
 @RequestMapping("/api")
@@ -50,14 +53,32 @@ public class AuthRestController {
         String accessToken = tokenProvider.createJwtToken(authentication, "access");
         String refreshToken = tokenProvider.createJwtToken(authentication, "refresh");
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + accessToken);
+        HttpHeaders httpHeaders = initCookieByToken(accessToken, refreshToken);
 
         ResultVO<TokenDto> resultVO = ResultVO.<TokenDto>builder().returnCode(ErrorCode.SUCCESS.getErrorCode())
                                             .msg(ErrorCode.SUCCESS.getErrorMsg())
                                             .data(new TokenDto(accessToken, refreshToken))
                                             .build();
         return new ResponseEntity<>(resultVO, httpHeaders, HttpStatus.OK);
+    }
+
+    private static HttpHeaders initCookieByToken(String accessToken, String refreshToken) {
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
+        accessTokenCookie.setSecure(true); // HTTPS에서만 쿠키가 전송됨
+        accessTokenCookie.setPath("/"); // 전체 경로에 대해 유효
+        accessTokenCookie.setMaxAge(60 * 60); // 1시간
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Set-Cookie", createCookieString(accessTokenCookie));
+        httpHeaders.add("Set-Cookie", createCookieString(refreshTokenCookie));
+        return httpHeaders;
     }
 
     @PostMapping("/reissue")

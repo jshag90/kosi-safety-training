@@ -72,6 +72,7 @@ public class SecurityConfig {
                 .antMatchers("/js/**").permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/assets/**").permitAll()
+                .antMatchers("/image/**").permitAll()
                 .antMatchers("/board/**").permitAll()
                 .antMatchers("/member/sign-up").permitAll()
                 .antMatchers("/course-lecture/**").permitAll()
