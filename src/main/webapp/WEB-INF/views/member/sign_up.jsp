@@ -295,8 +295,21 @@
             return;
         }
 
+        // 회사 전화번호 미입력 검증
+        if(companyNumber.length === 0 || companyNumber === '') {
+            Swal.fire({
+                title: '회사 전화번호를 입력해주세요.',
+                icon: 'error',
+                confirmButtonText: '확인',
+                didClose: () => {
+                    $('#companyNumber').focus();
+                }
+            });
+            return;
+        }
+        
         // 회사 전화번호 검증 (02-1234-5678, 010-1234-5678)
-        if (companyNumber.length > 0 && !companyPhoneRegex.test(companyNumber)) {
+        if (!companyPhoneRegex.test(companyNumber)) {
             Swal.fire({
                 title: '올바른 회사 전화번호를 입력해주세요.',
                 icon: 'error',
@@ -321,7 +334,6 @@
             headers: { 'Content-Type': 'application/json' }
         })
         .then(response => {
-            console.log('Response:', response);
 
             Swal.fire({
                 title: '회원가입',

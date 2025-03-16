@@ -199,9 +199,21 @@
             password: $('#loginPassword').val()
         };
 
-        axios.post("${contextPath}/api/authenticate", loginData)
+        axios.post("${contextPath}/api/authenticate", loginData, { withCredentials: true })
             .then(response => {
-                alert('로그인 성공');
+
+                Swal.fire({
+                title: '로그인',
+                text: '로그인이 완료되었습니다.',
+                icon: 'success',
+                confirmButtonText: '완료',
+                backdrop: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = "${contextPath}/";
+                    }
+                });
+
             })
             .catch(error => {
                 if (error.response && error.response.status === 401) {
