@@ -217,7 +217,7 @@
                         <a class="nav-link" style="color: black" href="#" onclick="logout()">로그아웃</a>
                         </li>
                         `);
-                        
+
                       closeModal();
                     }
                 });
@@ -245,8 +245,8 @@
                     backdrop: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = "${contextPath}/";
                         // Update the navigation bar to show "로그인" and "회원가입"
+                        $('#authLinks').children().hide();
                         $('#authLinks').html(`
                             <li class="nav-item">
                                 <a class="nav-link" style="color: black" data-bs-toggle="modal" data-bs-target="#loginModal">로그인</a>

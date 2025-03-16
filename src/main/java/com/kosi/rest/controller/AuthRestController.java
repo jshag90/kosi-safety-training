@@ -112,7 +112,10 @@ public class AuthRestController {
 
     @PostMapping("/logout")
     public ResponseEntity<ResultVO<Void>> logout(
-            @RequestBody @Valid TokenDto requestTokenDto) {
+            @CookieValue(value = "refreshToken", defaultValue = "") String refreshToken,
+            @CookieValue(value = "accessToken", defaultValue = "") String accessToken) {
+
+        TokenDto requestTokenDto = new TokenDto(accessToken, refreshToken);
         userService.logout(requestTokenDto.getRefreshToken());
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder().returnCode(ErrorCode.SUCCESS.getErrorCode())
