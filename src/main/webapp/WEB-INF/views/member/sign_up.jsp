@@ -98,6 +98,7 @@
     const phoneRegex = /^01[0-9]-\d{3,4}-\d{4}$/;
     const companyPhoneRegex = /^(01[0-9]-\d{3,4}-\d{4}|0\d{1,2}-\d{3,4}-\d{4})$/;
     const nameRegex = /^[가-힣a-zA-Z]+$/;
+    const nonWhitespaceRegex = /\S/;
 
     $(document).ready(function() {
         $('#password').on('input', function() {
@@ -264,6 +265,31 @@
                 confirmButtonText: '확인',
                 didClose: () => {
                     $('#birthday').focus();
+                }
+            });
+            return;
+        }
+
+        // 회사명 검증 (공백만 입력되지 않도록)
+        if (companyName === '') {
+            Swal.fire({
+                title: '회사명을 입력해주세요.',
+                icon: 'error',
+                confirmButtonText: '확인',
+                didClose: () => {
+                    $('#companyName').focus();
+                }
+            });
+            return;
+        }
+
+        if (!nonWhitespaceRegex.test(companyName)) {
+            Swal.fire({
+                title: '회사명에는 공백이 포함될 수 없습니다.',
+                icon: 'error',
+                confirmButtonText: '확인',
+                didClose: () => {
+                    $('#companyName').focus();
                 }
             });
             return;
