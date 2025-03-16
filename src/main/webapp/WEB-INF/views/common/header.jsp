@@ -53,7 +53,7 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-       <div class="navbar-nav ms-auto mb-2 mb-lg-0">
+       <div class="navbar-nav ms-auto mb-2 mb-lg-0" id="authLinks">
          <li class="nav-item">
            <a class="nav-link" style="color: black" data-bs-toggle="modal" data-bs-target="#loginModal">로그인</a>
          </li>
@@ -210,7 +210,15 @@
                 backdrop: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                      window.location.href = "${contextPath}/";
+                      // Update the navigation bar to show "로그아웃"
+                      $('#authLinks').children().hide();
+                      $('#authLinks').html(`
+                      <li class="nav-item">
+                        <a class="nav-link" style="color: black" href="#" onclick="logout()">로그아웃</a>
+                        </li>
+                        `);
+                        
+                      closeModal();
                     }
                 });
 
@@ -224,6 +232,36 @@
                 }
           });
 
+    }
+
+    function logout() {
+        axios.post("${contextPath}/api/logout", {}, { withCredentials: true })
+            .then(response => {
+                Swal.fire({
+                    title: '로그아웃',
+                    text: '로그아웃이 완료되었습니다.',
+                    icon: 'success',
+                    confirmButtonText: '완료',
+                    backdrop: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "${contextPath}/";
+                        // Update the navigation bar to show "로그인" and "회원가입"
+                        $('#authLinks').html(`
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: black" data-bs-toggle="modal" data-bs-target="#loginModal">로그인</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: black" href="${contextPath}/member/sign-up">회원가입</a>
+                            </li>
+                        `);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+                alert('로그아웃 중 오류가 발생했습니다.');
+            });
     }
 
     </script>
