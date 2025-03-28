@@ -79,7 +79,7 @@
                 <b>집체교육</b>
               </a>
               <ul class="dropdown-menu" aria-labelledby="groupTrainingDropdown">
-                <li><a class="dropdown-item" href="#!">집체교육 소개</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/group-education/introduction">집체교육 소개</a></li>
                 <li><a class="dropdown-item" href="#!">수강안내 및 신청</a></li>
                 <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a></li>
                 <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a></li>

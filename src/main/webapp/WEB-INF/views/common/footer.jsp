@@ -41,7 +41,7 @@
             
 			<p style="font-size:12px;">
 				<b>강릉사무실</b> : 강원특별자치도 강릉시 강릉대로 344, 2층(포남동)  <span style="margin-left: 15px;">TEL (033) 645-6330</span>  <span style="margin-left: 15px;">FAX (033) 645-6331</span><br>
-				<b>원주사무실 </b>: 강원특별자치도 원주시 북원로 2592, 2층(우산동)  <span style="margin-left: 13px;">TEL (033) 732-6330</span><span style="margin-left: 13px;">FAX (033) 732-6331</span>
+				<b>원주사무실 </b>: 강원특별자치도 원주시 만대로 196-6, 3층(무실동)  <span style="margin-left: 13px;">TEL (033) 732-6330</span><span style="margin-left: 13px;">FAX (033) 732-6331</span>
 			</p>
 			
 			<p style="font-size:13px;">Copyright©2025 <b>한국안전원(주)</b> All Right Reserved.</p>
