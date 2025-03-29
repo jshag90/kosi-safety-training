@@ -17,7 +17,7 @@
             <%@include file ="./sidebar.jsp" %>
 
             <!-- 메인 콘텐츠 -->
-            <main class="col-md-10">
+            <main class="col-md-9">
                 <h2>집체교육 소개</h2>
                 <div class="border-top border-default my-4"></div>
                 <div class="container mt-4">
@@ -39,7 +39,7 @@
                         <div class="row gx-4 gx-lg-5">
                             <div class="col-md-30 mb-5">
                               <div class="card h-100">
-                                    <div class="card-body" style="background-color: #C0CDEF;">
+                                    <div class="card-body"  style="background-color: #C0CDEF;">
                                     <h2 class="card-title">교육 운영 절차</h2>
                                     </div>
                                     <div class="card-footer">

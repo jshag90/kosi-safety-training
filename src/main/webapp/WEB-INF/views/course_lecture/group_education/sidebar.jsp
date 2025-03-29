@@ -9,7 +9,7 @@
 
 <c:set var="contextPath" value="<%= request.getContextPath()%>"></c:set>
       <!-- 왼쪽 사이드바 -->
-      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      <nav class="col-md-3 d-none d-md-block bg-light sidebar">
         <div class="position-sticky">
             <ul class="nav flex-column">
                 <li class="nav-item">
@@ -19,13 +19,15 @@
                             <a class="nav-link" href="/course-lecture/group-education/introduction">집체교육 소개</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">수강안내 및 신청</a>
+                            <a class="nav-link" href="/course-lecture/group-education/supervisor-training-manufacture">수강안내 및 신청</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">관리감독자 교육(제조업)</a>
+                            <a class="nav-link" href="/course-lecture/group-education/supervisor-training-manufacture">
+                                &nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">관리감독자 교육(기타업)</a>
+                            <a class="nav-link" href="/course-lecture/group-education/supervisor-training-etc">
+                                &nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a>
                         </li>
                     </ul>
                 </li>
