@@ -80,9 +80,9 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="groupTrainingDropdown">
                 <li><a class="dropdown-item" href="${contextPath}/course-lecture/group-education/introduction">집체교육 소개</a></li>
-                <li><a class="dropdown-item" href="#!">수강안내 및 신청</a></li>
-                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a></li>
-                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/group-education/supervisor-training-manufacture">수강안내 및 신청</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/group-education/supervisor-training-manufacture" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/group-education/supervisor-training-etc" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a></li>
               </ul>
             </li>
     
@@ -92,13 +92,13 @@
                 <b>인터넷 교육</b>
               </a>
               <ul class="dropdown-menu" aria-labelledby="onlineTrainingDropdown">
-                <li><a class="dropdown-item" href="#!">인터넷 교육소개</a></li>
-                <li><a class="dropdown-item" href="#!">수강안내 및 신청</a></li>
-                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 근로자 정기교육</a></li>
-                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 채용 시 교육</a></li>
-                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 작업내용 변경 시 교육</a></li>
-                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a></li>
-                <li><a class="dropdown-item" href="#!" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/online-education/introduction">인터넷 교육소개</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/online-education/regular-training">수강안내 및 신청</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/online-education/regular-training" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 근로자 정기교육</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/online-education/onboarding-training" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 채용 시 교육</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/online-education/change-work-training"" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 작업내용 변경 시 교육</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/online-education/supervisor-training-manufacture" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(제조업)</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/online-education/supervisor-training-etc" style="color: gray;">&nbsp;<i class="fa-regular fa-circle fa-sm"></i> 관리감독자 교육(기타업)</a></li>
               </ul>
             </li>
     
