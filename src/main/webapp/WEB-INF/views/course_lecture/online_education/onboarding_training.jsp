@@ -22,7 +22,17 @@
                 <div class="border-top border-default my-4"></div>
                 <div class="container mt-4">
                     <form class="row g-2">
-                       
+
+                         <div class="row gx-4 gx-lg-5">
+                           <div class="col-md-30 mb-5">
+                             <div class="card h-100">
+                               <div class="card-body">
+                                 인터넷교육 체계 구축 · 개발로 인하여 당분간 인터넷교육 수강이 불가능합니다.
+                                 양해 부탁드리며, 빠른 시일 내에 인터넷교육 수강이 가능하도록 조치하도록 하겠습니다.
+                               </div>
+                             </div>
+                           </div>
+                         </div>
 
 
                     </form>

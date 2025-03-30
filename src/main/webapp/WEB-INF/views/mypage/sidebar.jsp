@@ -16,6 +16,9 @@
                     <span class="nav-link fw-bold text-dark">마이페이지</span> <!-- 서브메뉴 헤더 -->
                     <ul class="nav flex-column ms-3"> <!-- 하위 항목 -->
                         <li class="nav-item">
+                            <a class="nav-link" href="${contextPath}/my-page/modify-account">개인정보</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#">내 강의보기</a>
                         </li>
                         <li class="nav-item">
@@ -23,9 +26,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">수료증발급</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">개인정보수정</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="${contextPath}/course-lecture/course/save">교육과정등록</a>

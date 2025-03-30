@@ -76,6 +76,7 @@ public class SecurityConfig {
                 .antMatchers("/board/**").permitAll()
                 .antMatchers("/member/sign-up").permitAll()
                 .antMatchers("/course-lecture/**").permitAll()
+                .antMatchers("/my-page/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

@@ -120,7 +120,7 @@
                 <b>마이페이지</b>
               </a>
               <ul class="dropdown-menu" aria-labelledby="mypageDropdown">
-                <li><a class="dropdown-item" href="#!">개인정보수정</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/my-page/modify-account">개인정보</a></li>
                 <li><a class="dropdown-item" href="#!">나의 강의실</a></li>
                 <li><a class="dropdown-item" href="#!">수강신청 내역</a></li>
                 <li><a class="dropdown-item" href="#!">수료증발급</a></li>
