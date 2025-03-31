@@ -22,32 +22,70 @@
     />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link rel="stylesheet" href="${contextPath}/css/styles.css" />
+
+    <!-- Slick Slider CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+    <style>
+      .slick-slider div {
+        text-align: center;
+      }
+
+      .slick-slider img {
+        width: 100%;
+        height: 16rem;
+        object-fit: cover;
+      }
+    </style>
   </head>
   <body>
-
     <%@include file ="common/header.jsp" %>
-    
+
     <!-- Page Content-->
     <div class="container px-4 px-lg-5">
       <!-- Heading Row-->
       <div class="row gx-4 gx-lg-5 align-items-center my-5">
         <div class="col-lg-12">
-          <img
-            class="img-fluid rounded mb-4 mb-lg-0"
-            src="https://dummyimage.com/900x400/dee2e6/6c757d.jpg"
-            alt="..."
-          />
+          <div class="slick-slider">
+            <div>
+              <img
+                src="https://picsum.photos/1200/400?random=1"
+                class="img-fluid"
+                alt="Slide 1"
+              />
+            </div>
+            <div>
+              <img
+                src="https://picsum.photos/1200/400?random=2"
+                class="img-fluid"
+                alt="Slide 2"
+              />
+            </div>
+            <div>
+              <img
+                src="https://picsum.photos/1200/400?random=3"
+                class="img-fluid"
+                alt="Slide 3"
+              />
+            </div>
+            <div>
+              <img
+                src="https://picsum.photos/1200/400?random=4"
+                class="img-fluid"
+                alt="Slide 4"
+              />
+            </div>
+          </div>
         </div>
-       <!--  <div class="col-lg-5">
-          <h1 class="font-weight-light">Business Name or Tagline</h1>
-          <p>
-            This is a template that is great for small businesses. It doesn't
-            have too much fancy flare to it, but it makes a great use of the
-            standard Bootstrap core components. Feel free to use this template
-            for any project you want!
-          </p>
-          <a class="btn btn-primary" href="#!">Call to Action!</a>
-        </div> -->
       </div>
       <!-- Call to Action-->
       <div class="card text-white bg-secondary my-5 py-4 text-center">
@@ -108,10 +146,37 @@
         </div>
       </div>
     </div>
-    
+
     <%@include file ="common/footer.jsp" %>
 
-    <!-- Core theme JS-->
     <script src="${contextPath}/js/scripts.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $(".slick-slider").slick({
+          slidesToShow: 1, // 한 번에 보여줄 슬라이드 개수
+          slidesToScroll: 1,
+          autoplay: true, // 자동 재생
+          autoplaySpeed: 10000, // 자동 재생 속도 (10초)
+          arrows: true, // 이전/다음 화살표 표시
+          dots: true, // 페이지네이션 표시
+          responsive: [
+            {
+              breakpoint: 768,
+              settings: {
+                slidesToShow: 2,
+              },
+            },
+            {
+              breakpoint: 480,
+              settings: {
+                slidesToShow: 1,
+              },
+            },
+          ],
+        });
+      });
+    </script>
   </body>
 </html>
