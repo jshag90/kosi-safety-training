@@ -55,36 +55,7 @@
       <!-- Heading Row-->
       <div class="row gx-4 gx-lg-5 align-items-center my-5">
         <div class="col-lg-12">
-          <div class="slick-slider">
-            <div>
-              <img
-                src="https://picsum.photos/1200/400?random=1"
-                class="img-fluid"
-                alt="Slide 1"
-              />
-            </div>
-            <div>
-              <img
-                src="https://picsum.photos/1200/400?random=2"
-                class="img-fluid"
-                alt="Slide 2"
-              />
-            </div>
-            <div>
-              <img
-                src="https://picsum.photos/1200/400?random=3"
-                class="img-fluid"
-                alt="Slide 3"
-              />
-            </div>
-            <div>
-              <img
-                src="https://picsum.photos/1200/400?random=4"
-                class="img-fluid"
-                alt="Slide 4"
-              />
-            </div>
-          </div>
+          <div class="slick-slider"></div>
         </div>
       </div>
       <!-- Call to Action-->
@@ -152,30 +123,80 @@
     <script src="${contextPath}/js/scripts.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
       $(document).ready(function () {
-        $(".slick-slider").slick({
-          slidesToShow: 1, // 한 번에 보여줄 슬라이드 개수
-          slidesToScroll: 1,
-          autoplay: true, // 자동 재생
-          autoplaySpeed: 10000, // 자동 재생 속도 (10초)
-          arrows: true, // 이전/다음 화살표 표시
-          dots: true, // 페이지네이션 표시
-          responsive: [
-            {
-              breakpoint: 768,
-              settings: {
-                slidesToShow: 2,
+        // 서버에서 이미지 데이터를 가져오는 함수
+        async function fetchSliderImages() {
+          try {
+            // 서버 API 호출 (예: /api/slider-images)
+            const response = await axios.get(
+              "${contextPath}/api/slider-images",
+              {
+                responseType: "arraybuffer", // byte[]로 받기 위해 설정
+              }
+            );
+
+            // 서버에서 받은 byte[] 데이터를 Base64로 변환
+            const images = response.data.map((image) => {
+              const base64Image = btoa(
+                new Uint8Array(image.bytes).reduce(
+                  (data, byte) => data + String.fromCharCode(byte),
+                  ""
+                )
+              );
+              return {
+                src: `data:image/jpeg;base64,${base64Image}`,
+                alt: image.alt || "Slide Image",
+              };
+            });
+
+            return images;
+          } catch (error) {
+            console.error("이미지 데이터를 가져오는 중 오류 발생:", error);
+            return [];
+          }
+        }
+
+        // 슬라이더 초기화 함수
+        async function initSlider() {
+          const sliderImages = await fetchSliderImages();
+
+          // 슬라이더에 이미지 추가
+          const $slider = $(".slick-slider");
+          sliderImages.forEach((image) => {
+            $slider.append(
+              `<div><img src="${image.src}" class="img-fluid" alt="${image.alt}" /></div>`
+            );
+          });
+
+          // Slick Slider 초기화
+          $slider.slick({
+            slidesToShow: 1, // 한 번에 보여줄 슬라이드 개수
+            slidesToScroll: 1,
+            autoplay: true, // 자동 재생
+            autoplaySpeed: 10000, // 자동 재생 속도 (10초)
+            arrows: true, // 이전/다음 화살표 표시
+            dots: true, // 페이지네이션 표시
+            responsive: [
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 2,
+                },
               },
-            },
-            {
-              breakpoint: 480,
-              settings: {
-                slidesToShow: 1,
+              {
+                breakpoint: 480,
+                settings: {
+                  slidesToShow: 1,
+                },
               },
-            },
-          ],
-        });
+            ],
+          });
+        }
+
+        // 슬라이더 초기화 실행
+        initSlider();
       });
     </script>
   </body>
