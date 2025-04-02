@@ -196,9 +196,9 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="courseFee">교육비</label>
+                            <label for="courseFee">교육비(원)</label>
                             <input
-                                type="number"
+                                type="text"
                                 class="form-control"
                                 id="courseFee"
                                 name="courseFee"
@@ -222,25 +222,25 @@
                         <div class="form-group">
                             <label for="courseThumbnail">교육썸네일</label>
                             <input
-                                type="text"
+                                type="file"
                                 class="form-control"
                                 id="courseThumbnail"
                                 name="courseThumbnail"
-                                placeholder="교육썸네일을 입력하세요."
+                                accept="image/*"
                                 required
                             />
                         </div>
 
                         <div class="form-group">
                             <label for="popupNotice">수강신청 팝업 안내문</label>
-                            <input
-                                type="text"
+                            <textarea
                                 class="form-control"
                                 id="popupNotice"
                                 name="popupNotice"
+                                rows="3"
                                 placeholder="수강신청 팝업 안내문을 입력하세요."
                                 required
-                            />
+                            ></textarea>
                         </div>
 
                         <div class="form-group text-center">
@@ -262,14 +262,17 @@
 
     <%@include file ="../../common/footer.jsp" %>
     <script>
-        // Fetch categories from the server and populate the select element
         $(document).ready(function () {
+            initCourseCategorySelector();
+            initDatePickers();
+            initTimePickers();
+            initCourseFeeFormatting();
+        });
+
+        // Function to initialize course category selector
+        function initCourseCategorySelector() {
             const categorySelect = $('#category');
-
-            // API endpoint
-            const apiEndpoint = "${contextPath}/course-lecture/course-category";
-
-            // Get the accessToken from sessionStorage
+            const apiEndpoint = `${contextPath}/course-lecture/course-category`;
             const accessToken = sessionStorage.getItem("accessToken");
 
             if (!accessToken) {
@@ -277,7 +280,6 @@
                 return;
             }
 
-            // Make the API request with the Authorization header
             axios.get(apiEndpoint, {
                 headers: {
                     "Authorization": "Bearer " + accessToken
@@ -286,8 +288,8 @@
             .then(response => {
                 const categories = response.data.data; // Assuming the API returns an array of categories
                 categories.forEach(category => {
-                    const courseName = category.courseCategoryType+" - "+category.courseName;
-                    const option = "<option value="+category.id+">"+courseName+"</option>";
+                    const courseName = category.courseCategoryType + " - " + category.courseName;
+                    const option = `<option value="${category.id}">${courseName}</option>`;
                     categorySelect.append(option);
                 });
             })
@@ -295,9 +297,11 @@
                 console.error('Error fetching categories:', error);
                 alert('카테고리 목록을 불러오는 중 오류가 발생했습니다.');
             });
+        }
 
-            // Initialize the datepicker for the "교육일정" field
-            $("#educationSchedule").datepicker({
+        // Function to initialize datepickers
+        function initDatePickers() {
+            const datePickerOptions = {
                 dateFormat: "yy-mm-dd", // Format the date as YYYY-MM-DD
                 changeMonth: true, // Allow changing the month
                 changeYear: true, // Allow changing the year
@@ -312,10 +316,20 @@
                     "7월", "8월", "9월", "10월", "11월", "12월"
                 ], // Month names in Korean
                 dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"], // Day names in Korean
-            });
+            };
 
-            // Initialize the timepicker for the "교육시간" field
-            $("#educationTime").timepicker({
+            // Initialize datepickers for start and end dates
+            $("#startDate").datepicker(datePickerOptions);
+            $("#endDate").datepicker(datePickerOptions);
+
+            // Initialize datepickers for application start and end dates
+            $("#applyStartDate").datepicker(datePickerOptions);
+            $("#applyEndDate").datepicker(datePickerOptions);
+        }
+
+        // Function to initialize timepickers
+        function initTimePickers() {
+            const timePickerOptions = {
                 timeFormat: "HH:mm", // Format the time as HH:mm (24-hour format)
                 interval: 30, // Time interval in minutes
                 minTime: "00:00", // Minimum time
@@ -324,104 +338,25 @@
                 dynamic: false, // Dynamically adjust the dropdown
                 dropdown: true, // Show dropdown for time selection
                 scrollbar: true // Enable scrollbar for the dropdown
-            });
+            };
 
-            // Initialize the timepicker for the "교육 시작시간" field
-            $("#startTime").timepicker({
-                timeFormat: "HH:mm", // Format the time as HH:mm (24-hour format)
-                interval: 30, // Time interval in minutes
-                minTime: "00:00", // Minimum time
-                maxTime: "23:59", // Maximum time
-                startTime: "00:00", // Start time
-                dynamic: false, // Dynamically adjust the dropdown
-                dropdown: true, // Show dropdown for time selection
-                scrollbar: true // Enable scrollbar for the dropdown
-            });
+            // Initialize timepickers for start and end times
+            $("#startTime").timepicker(timePickerOptions);
+            $("#endTime").timepicker(timePickerOptions);
+        }
 
-            // Initialize the timepicker for the "교육 종료시간" field
-            $("#endTime").timepicker({
-                timeFormat: "HH:mm", // Format the time as HH:mm (24-hour format)
-                interval: 30, // Time interval in minutes
-                minTime: "00:00", // Minimum time
-                maxTime: "23:59", // Maximum time
-                startTime: "00:00", // Start time
-                dynamic: false, // Dynamically adjust the dropdown
-                dropdown: true, // Show dropdown for time selection
-                scrollbar: true // Enable scrollbar for the dropdown
+        // Function to initialize formatting for the "교육비" field
+        function initCourseFeeFormatting() {
+            $('#courseFee').on('input', function () {
+                const value = $(this).val().replace(/,/g, ''); // Remove existing commas
+                if (!isNaN(value) && value !== '') {
+                    const formattedValue = Number(value).toLocaleString('ko-KR'); // Format as currency
+                    $(this).val(formattedValue); // Update the input value
+                } else {
+                    $(this).val(''); // Clear the input if invalid
+                }
             });
-
-            // Initialize the datepicker for the "교육 시작일" field
-            $("#startDate").datepicker({
-                dateFormat: "yy-mm-dd", // Format the date as YYYY-MM-DD
-                changeMonth: true, // Allow changing the month
-                changeYear: true, // Allow changing the year
-                showButtonPanel: true, // Show button panel for "Today" and "Done"
-                closeText: "닫기", // Text for the close button
-                currentText: "오늘", // Text for the "Today" button
-                showAnim: "slideDown", // Animation for showing the datepicker
-                prevText: "이전", // Text for the previous month button
-                nextText: "다음", // Text for the next month button
-                monthNames: [
-                    "1월", "2월", "3월", "4월", "5월", "6월",
-                    "7월", "8월", "9월", "10월", "11월", "12월"
-                ], // Month names in Korean
-                dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"], // Day names in Korean
-            });
-
-            // Initialize the datepicker for the "교육 종료일" field
-            $("#endDate").datepicker({
-                dateFormat: "yy-mm-dd", // Format the date as YYYY-MM-DD
-                changeMonth: true, // Allow changing the month
-                changeYear: true, // Allow changing the year
-                showButtonPanel: true, // Show button panel for "Today" and "Done"
-                closeText: "닫기", // Text for the close button
-                currentText: "오늘", // Text for the "Today" button
-                showAnim: "slideDown", // Animation for showing the datepicker
-                prevText: "이전", // Text for the previous month button
-                nextText: "다음", // Text for the next month button
-                monthNames: [
-                    "1월", "2월", "3월", "4월", "5월", "6월",
-                    "7월", "8월", "9월", "10월", "11월", "12월"
-                ], // Month names in Korean
-                dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"], // Day names in Korean
-            });
-
-            // Initialize the datepicker for the "신청 시작일" field
-            $("#applyStartDate").datepicker({
-                dateFormat: "yy-mm-dd", // Format the date as YYYY-MM-DD
-                changeMonth: true, // Allow changing the month
-                changeYear: true, // Allow changing the year
-                showButtonPanel: true, // Show button panel for "Today" and "Done"
-                closeText: "닫기", // Text for the close button
-                currentText: "오늘", // Text for the "Today" button
-                showAnim: "slideDown", // Animation for showing the datepicker
-                prevText: "이전", // Text for the previous month button
-                nextText: "다음", // Text for the next month button
-                monthNames: [
-                    "1월", "2월", "3월", "4월", "5월", "6월",
-                    "7월", "8월", "9월", "10월", "11월", "12월"
-                ], // Month names in Korean
-                dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"], // Day names in Korean
-            });
-
-            // Initialize the datepicker for the "신청 종료일" field
-            $("#applyEndDate").datepicker({
-                dateFormat: "yy-mm-dd", // Format the date as YYYY-MM-DD
-                changeMonth: true, // Allow changing the month
-                changeYear: true, // Allow changing the year
-                showButtonPanel: true, // Show button panel for "Today" and "Done"
-                closeText: "닫기", // Text for the close button
-                currentText: "오늘", // Text for the "Today" button
-                showAnim: "slideDown", // Animation for showing the datepicker
-                prevText: "이전", // Text for the previous month button
-                nextText: "다음", // Text for the next month button
-                monthNames: [
-                    "1월", "2월", "3월", "4월", "5월", "6월",
-                    "7월", "8월", "9월", "10월", "11월", "12월"
-                ], // Month names in Korean
-                dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"], // Day names in Korean
-            });
-        });
+        }
     </script>
 </body>
 </html>
