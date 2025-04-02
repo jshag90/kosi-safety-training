@@ -29,7 +29,7 @@
                 <h2>교육과정등록</h2>
                 <div class="border-top border-default my-4"></div>
                 <div class="container mt-4">
-                    <form class="row g-2">
+                    <form id="courseForm" class="row g-2">
 
                         <div class="form-group row">
                             <label class="col-md-2 col-form-label">노출여부</label>
@@ -248,7 +248,7 @@
                                 type="button"
                                 class="btn btn-primary"
                                 id="registerButton"
-                                onclick=""
+                                onclick="submitForm()"
                             >
                                 등록하기
                             </button>
@@ -289,7 +289,7 @@
                 const categories = response.data.data; // Assuming the API returns an array of categories
                 categories.forEach(category => {
                     const courseName = category.courseCategoryType + " - " + category.courseName;
-                    const option = `<option value="${category.id}">${courseName}</option>`;
+                    const option = "<option value="+category.id+">"+courseName+"</option>";
                     categorySelect.append(option);
                 });
             })
@@ -355,6 +355,39 @@
                 } else {
                     $(this).val(''); // Clear the input if invalid
                 }
+            });
+        }
+
+        // Function to submit the form
+        function submitForm() {
+            const form = $('#courseForm')[0]; // Select the form element
+            const formData = new FormData(form); // Create a FormData object from the form
+
+            // Get the selected visibility value
+            const visibility = $('input[name="visibility"]:checked').val();
+            formData.append('visibility', visibility);
+
+            // Log form data for debugging
+            console.log('Form Data:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
+            }
+
+            // Send the form data to the server using Axios
+            axios.post(`${contextPath}/api/course/register`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data', // Required for file uploads
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}` // Include access token
+                }
+            })
+            .then(response => {
+                alert('등록이 완료되었습니다.');
+                console.log('Response:', response.data);
+                // Redirect or perform additional actions after successful submission
+            })
+            .catch(error => {
+                console.error('Error submitting form:', error);
+                alert('등록 중 오류가 발생했습니다.');
             });
         }
     </script>
