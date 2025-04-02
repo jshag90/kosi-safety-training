@@ -77,6 +77,7 @@ public class SecurityConfig {
                 .antMatchers("/member/sign-up").permitAll()
                 .antMatchers("/course-lecture/**").permitAll()
                 .antMatchers("/my-page/**").permitAll()
+                .antMatchers("/web-settings/main-slide-images").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

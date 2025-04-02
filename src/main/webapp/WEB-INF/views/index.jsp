@@ -14,6 +14,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>한국안전원(주) 에듀센터</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Favicon-->
     <link
       rel="icon"
@@ -121,7 +122,6 @@
     <%@include file ="common/footer.jsp" %>
 
     <script src="${contextPath}/js/scripts.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
@@ -129,29 +129,33 @@
         // 서버에서 이미지 데이터를 가져오는 함수
         async function fetchSliderImages() {
           try {
-            // 서버 API 호출 (예: /api/slider-images)
+            // 서버 API 호출
             const response = await axios.get(
-              "${contextPath}/api/slider-images",
-              {
-                responseType: "arraybuffer", // byte[]로 받기 위해 설정
-              }
+              "${contextPath}/web-settings/main-slide-images"
             );
 
-            // 서버에서 받은 byte[] 데이터를 Base64로 변환
-            const images = response.data.map((image) => {
-              const base64Image = btoa(
-                new Uint8Array(image.bytes).reduce(
-                  (data, byte) => data + String.fromCharCode(byte),
-                  ""
-                )
-              );
-              return {
-                src: `data:image/jpeg;base64,${base64Image}`,
-                alt: image.alt || "Slide Image",
-              };
-            });
+            // 서버에서 받은 데이터를 처리
+            if (
+              response.data.returnCode === 0 &&
+              Array.isArray(response.data.data)
+            ) {
+              const images = response.data.data.map((image) => {
+                const base64Image = image.imageData; // Base64 데이터 사용
+                console.log(JSON.stringify(base64Image)); // 디버깅을 위한 로그 출력
+                return {
+                  src: "data:image/png;base64," + base64Image,
+                  alt: image.imageName || "Slide Image",
+                };
+              });
 
-            return images;
+              return images;
+            } else {
+              console.error(
+                "이미지 데이터 형식이 올바르지 않습니다:",
+                response.data
+              );
+              return [];
+            }
           } catch (error) {
             console.error("이미지 데이터를 가져오는 중 오류 발생:", error);
             return [];
@@ -161,12 +165,16 @@
         // 슬라이더 초기화 함수
         async function initSlider() {
           const sliderImages = await fetchSliderImages();
-
+          console.log(JSON.stringify(sliderImages)); // 디버깅을 위한 로그 출력
           // 슬라이더에 이미지 추가
           const $slider = $(".slick-slider");
-          sliderImages.forEach((image) => {
+          sliderImages.forEach(function (image) {
             $slider.append(
-              `<div><img src="${image.src}" class="img-fluid" alt="${image.alt}" /></div>`
+              '<div><img src="' +
+                image.src +
+                '" class="img-fluid" alt="' +
+                image.alt +
+                '" /></div>'
             );
           });
 
