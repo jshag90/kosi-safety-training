@@ -243,13 +243,14 @@
                             />
                         </div>
 
-                        <div class="form-group text-right">
+                        <div class="form-group text-center">
                             <button
                                 type="button"
                                 class="btn btn-primary"
+                                id="registerButton"
                                 onclick=""
                             >
-                                교육과정생성하기
+                                등록하기
                             </button>
                         </div>
 
