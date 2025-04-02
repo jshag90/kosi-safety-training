@@ -1,0 +1,39 @@
+package com.kosi.rest.controller;
+
+import com.kosi.dto.CourseCategoryDto;
+import com.kosi.dto.ListResp;
+import com.kosi.dto.NoticeDto;
+import com.kosi.entity.CourseCategory;
+import com.kosi.service.CourseLectureService;
+import com.kosi.util.ErrorCode;
+import com.kosi.vo.DataTablesRequest;
+import com.kosi.vo.ResultVO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+@RequestMapping("/course-lecture")
+@RequiredArgsConstructor
+public class CourseLectureRestController {
+
+    private final CourseLectureService courseLectureService;
+    @GetMapping("/course-category")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ResultVO<List<CourseCategoryDto>>> getCourseCategoryTypes() {
+        ResultVO<List<CourseCategoryDto>> resultVO = ResultVO.<List<CourseCategoryDto>>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(courseLectureService.getCourseCategoryTypeList())
+                .build();
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
+}

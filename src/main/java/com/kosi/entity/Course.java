@@ -52,4 +52,7 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Lecture> lectures;
 
+    @Column(nullable = false)
+    private boolean isPublished; // 강좌 노출 여부 (기본값 true)
+
 }
