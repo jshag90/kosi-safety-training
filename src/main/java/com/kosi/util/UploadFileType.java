@@ -1,5 +1,5 @@
 package com.kosi.util;
 
 public enum UploadFileType {
-    NOTICE, FAQ
+    NOTICE, FAQ, COURSE_THUMBNAIL, COURSE
 }

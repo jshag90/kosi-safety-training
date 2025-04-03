@@ -21,12 +21,16 @@ public class UploadFiles {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UploadFileType uploadFileType; // 수강 상태
+    private UploadFileType uploadFileType;
 
     private Long postId;
 
     private String fileName;
 
     private String fileReName;
+
+    @Lob
+    @Column(nullable = false)
+    private byte[] fileData;
 
 }
