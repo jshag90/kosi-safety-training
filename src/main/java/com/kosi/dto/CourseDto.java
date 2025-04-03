@@ -49,4 +49,7 @@ public class CourseDto {
 
     @JsonIgnore
     String courseCategoryType;
+
+    String courseThumbnailBase64;
+
 }

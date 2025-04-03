@@ -5,14 +5,16 @@ import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
 import com.kosi.util.CourseCategory;
 import com.kosi.util.CourseCategoryType;
+import com.kosi.util.CourseStatus;
+import com.kosi.util.DateUtil;
 import com.kosi.vo.CourseVO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,35 +40,55 @@ public class CourseLectureService {
         List<CourseDto> handleCourseList = new ArrayList<>();
 
         for (CourseDto courseDto : courseList) {
-            //TODO 현재 사용자 신청 인원 count 가져오기
-            Integer currentApplyCount = 0;
-            int currentEnrollment = currentApplyCount + courseDto.getWrittenApplicationCount();
+            Long courseId = courseDto.getCourseId();
 
-            //TODO 현재 날짜, 인원 통해서 과정 상태 정보 초기화
-            String courseStatus = "WAIT";
+            Integer currentApplyCount = courseLectureDao.getApplyEnrollmentCountByCourseId(courseId).intValue();
+            int currentEnrollment = currentApplyCount + courseDto.getWrittenApplicationCount(); //신청 사용자 + 서명 등록 사용자 수
 
-            //TODO 강의 날짜, 강의 시간 합계 통해서 총 시간 계산하기
-            String courseTimeSum = "1일 20시간";
             CourseDto handleCourseDto = CourseDto.builder()
-                    .courseId(courseDto.getCourseId())
+                    .courseId(courseId)
                     .title(courseDto.getTitle())
                     .courseStartDate(courseDto.getCourseStartDate())
                     .courseEndDate(courseDto.getCourseEndDate())
                     .applyStartDate(courseDto.getApplyStartDate())
                     .applyEndDate(courseDto.getApplyEndDate())
-                    .courseTimeSum(courseTimeSum)
+                    .courseTimeSum(getCourseTimeSumByCourseDto(courseDto))
                     .courseQuestion(courseQuestion)
                     .maxCapacity(courseDto.getMaxCapacity())
                     .currentEnrollment(currentEnrollment)
                     .writtenApplicationCount(courseDto.getWrittenApplicationCount())
                     .location(courseDto.getLocation())
                     .price(courseDto.getPrice())
-                    .courseStatus(courseStatus)
+                    .courseStatus(getCourseStatusByCourseDto(currentEnrollment, courseDto))
+                    .courseCategoryId(courseDto.getCourseCategoryId())
+                    .courseThumbnailBase64(courseLectureDao.getCourseThumbnailByCourseId(courseId))
                     .build();
 
             handleCourseList.add(handleCourseDto);
         }
 
         return handleCourseList;
+    }
+
+    private String getCourseStatusByCourseDto(int currentEnrollment, CourseDto courseDto) {
+
+        if(courseDto.getMaxCapacity() <= currentEnrollment){
+            return CourseStatus.OVER_PERSON_COUNT.name();
+        }
+
+        if (LocalDate.now().isBefore(courseDto.getApplyStartDate())
+                || LocalDate.now().isAfter(courseDto.getApplyEndDate())) {
+            return CourseStatus.INVALID_APPLY_DATE.name();
+        }
+
+        return CourseStatus.OK_APPLY.name();
+    }
+
+    private String getCourseTimeSumByCourseDto(CourseDto courseDto) {
+        int diffDayStartDateAndEndDate = DateUtil.getDiffDayStartDateAndEndDate(courseDto.getCourseStartDate(), courseDto.getCourseEndDate());
+        int diffTimeStartTimeAndEndTime = DateUtil.getDiffTimeStartTimeAndEndTime(courseDto.getCourseStartTime(), courseDto.getCourseEndTime());
+
+        int totalMinute = (diffDayStartDateAndEndDate + 1) * diffTimeStartTimeAndEndTime;
+        return DateUtil.formatMinutesToDaysHoursMinutes(totalMinute);
     }
 }

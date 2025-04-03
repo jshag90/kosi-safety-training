@@ -2,10 +2,12 @@ package com.kosi.dao;
 
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
+import com.kosi.dto.CourseThumbnailDto;
 import com.kosi.entity.Course;
 import com.kosi.entity.UploadFiles;
 import com.kosi.util.CourseCategory;
 import com.kosi.util.CourseCategoryType;
+import com.kosi.util.EnrollmentStatus;
 import com.kosi.util.UploadFileType;
 import com.kosi.vo.CourseVO;
 import com.querydsl.core.types.Projections;
@@ -17,7 +19,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,6 +26,8 @@ import java.util.*;
 
 import static com.kosi.entity.QCourseCategory.courseCategory;
 import static com.kosi.entity.QCourse.course;
+import static com.kosi.entity.QEnrollment.enrollment;
+import static com.kosi.entity.QUploadFiles.uploadFiles;
 
 @Repository
 @RequiredArgsConstructor
@@ -101,7 +104,7 @@ public class CourseLectureDao {
                         , course.writtenApplicationCount
                         , course.location
                         , course.price
-                        , course.courseCategory.courseCategoryId
+                        , courseCategory.courseCategoryId
                         , courseCategory.courseCategoryType
                 )).from(course)
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
@@ -112,16 +115,25 @@ public class CourseLectureDao {
                 .fetch();
     }
 
-    public CourseCategoryDto getCourseCategoryById(Long courseCategoryId) {
-        return jpaQueryFactory.select(
-                        Projections.bean(CourseCategoryDto.class,
-                                courseCategory.courseCategoryId.as("id")
-                                , courseCategory.courseCategoryType.stringValue().as("courseCategoryType")
-                                , courseCategory.name.as("courseName")
-                        )
-                ).from(courseCategory)
-                .where(courseCategory.courseCategoryId.eq(courseCategoryId))
-                .fetchOne();
+
+    public Long getApplyEnrollmentCountByCourseId(Long courseId) {
+        return jpaQueryFactory.selectFrom(enrollment)
+                .innerJoin(course).on(enrollment.course.courseId.eq(course.courseId))
+                .where(course.courseId.eq(courseId)
+                        .and(enrollment.status.eq(EnrollmentStatus.APPLY)))
+                .fetchCount();
+    }
+
+    public String getCourseThumbnailByCourseId(Long courseId) {
+        Optional<CourseThumbnailDto> courseThumbnailDto = Optional.ofNullable(jpaQueryFactory.select(Projections.bean(CourseThumbnailDto.class, uploadFiles.fileData))
+                .from(uploadFiles)
+                .where(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL).and(uploadFiles.postId.eq(courseId)))
+                .fetchOne());
+
+        if (!courseThumbnailDto.isPresent())
+            return "";
+
+        return Base64.getEncoder().encodeToString(courseThumbnailDto.get().getFileData());
     }
 
 
