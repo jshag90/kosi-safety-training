@@ -3,6 +3,8 @@ package com.kosi.service;
 import com.kosi.dao.CourseLectureDao;
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
+import com.kosi.util.CourseCategory;
+import com.kosi.util.CourseCategoryType;
 import com.kosi.vo.CourseVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
@@ -31,8 +33,8 @@ public class CourseLectureService {
     }
 
     @Transactional(readOnly = true)
-    public List<CourseDto> getCourseList(Integer pageSize, Integer page) {
-        List<CourseDto> courseList = courseLectureDao.getCourseList(pageSize, page);
+    public List<CourseDto> getCourseList(Integer pageSize, Integer page, CourseCategoryType courseCategoryType, CourseCategory courseCategory) {
+        List<CourseDto> courseList = courseLectureDao.getCourseList(pageSize, page, courseCategoryType, courseCategory);
         List<CourseDto> handleCourseList = new ArrayList<>();
 
         for (CourseDto courseDto : courseList) {

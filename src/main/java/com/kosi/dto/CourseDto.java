@@ -44,4 +44,9 @@ public class CourseDto {
     Integer price;
 
     String courseStatus;
+
+    Long courseCategoryId;
+
+    @JsonIgnore
+    String courseCategoryType;
 }

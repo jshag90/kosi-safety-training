@@ -3,6 +3,8 @@ package com.kosi.rest.controller;
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
 import com.kosi.service.CourseLectureService;
+import com.kosi.util.CourseCategory;
+import com.kosi.util.CourseCategoryType;
 import com.kosi.util.ErrorCode;
 import com.kosi.vo.CourseVO;
 import com.kosi.vo.ResultVO;
@@ -56,10 +58,12 @@ public class CourseLectureRestController {
     @GetMapping("/course/list")
     public ResponseEntity<ResultVO<List<CourseDto>>> getCourseList(
             @RequestParam("pageSize") Integer pageSize,
-            @RequestParam("page") Integer page
-    ){
+            @RequestParam("page") Integer page,
+            @RequestParam("courseCategoryType") CourseCategoryType courseCategoryType,
+            @RequestParam("courseCategory") CourseCategory courseCategory
+    ) {
 
-        List<CourseDto> courseDtoList = courseLectureService.getCourseList(pageSize, page);
+        List<CourseDto> courseDtoList = courseLectureService.getCourseList(pageSize, page, courseCategoryType, courseCategory);
         ResultVO<List<CourseDto>> resultVO = ResultVO.<List<CourseDto>>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())

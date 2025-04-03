@@ -3,8 +3,9 @@ package com.kosi.dao;
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
 import com.kosi.entity.Course;
-import com.kosi.entity.CourseCategory;
 import com.kosi.entity.UploadFiles;
+import com.kosi.util.CourseCategory;
+import com.kosi.util.CourseCategoryType;
 import com.kosi.util.UploadFileType;
 import com.kosi.vo.CourseVO;
 import com.querydsl.core.types.Projections;
@@ -85,7 +86,7 @@ public class CourseLectureDao {
 
     }
 
-    public List<CourseDto> getCourseList(Integer pageSize, Integer page) {
+    public List<CourseDto> getCourseList(Integer pageSize, Integer page, CourseCategoryType courseCategoryType, CourseCategory courseCategoryName) {
         int offset = (page - 1) * pageSize;
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
                         course.courseId
@@ -100,10 +101,28 @@ public class CourseLectureDao {
                         , course.writtenApplicationCount
                         , course.location
                         , course.price
+                        , course.courseCategory.courseCategoryId
+                        , courseCategory.courseCategoryType
                 )).from(course)
+                .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
+                .where(courseCategory.courseCategoryType.eq(courseCategoryType.getName()).and(courseCategory.name.eq(courseCategoryName.getCourseCategoryTypeText())))
                 .orderBy(course.applyStartDate.desc())
                 .limit(pageSize)
                 .offset(offset)
                 .fetch();
     }
+
+    public CourseCategoryDto getCourseCategoryById(Long courseCategoryId) {
+        return jpaQueryFactory.select(
+                        Projections.bean(CourseCategoryDto.class,
+                                courseCategory.courseCategoryId.as("id")
+                                , courseCategory.courseCategoryType.stringValue().as("courseCategoryType")
+                                , courseCategory.name.as("courseName")
+                        )
+                ).from(courseCategory)
+                .where(courseCategory.courseCategoryId.eq(courseCategoryId))
+                .fetchOne();
+    }
+
+
 }
