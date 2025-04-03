@@ -1,6 +1,7 @@
 package com.kosi.dao;
 
 import com.kosi.dto.CourseCategoryDto;
+import com.kosi.dto.CourseDto;
 import com.kosi.entity.Course;
 import com.kosi.entity.CourseCategory;
 import com.kosi.entity.UploadFiles;
@@ -22,6 +23,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static com.kosi.entity.QCourseCategory.courseCategory;
+import static com.kosi.entity.QCourse.course;
 
 @Repository
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class CourseLectureDao {
     @Transactional
     public void saveCourse(CourseVO.RequestSaveVO requestSaveVO) throws IOException {
         Long courseCategoryId = Long.valueOf(requestSaveVO.getCategory());
-        long courseFee = Long.parseLong(requestSaveVO.getCourseFee().replace(",",""));
+        long courseFee = Long.parseLong(requestSaveVO.getCourseFee().replace(",", ""));
 
         Course saveCourse = Course.builder()
                 .courseCategory(jpaQueryFactory.selectFrom(courseCategory).where(courseCategory.courseCategoryId.eq(courseCategoryId)).fetchOne())
@@ -70,7 +72,7 @@ public class CourseLectureDao {
 
         entityManager.persist(saveCourse);
 
-        if(!requestSaveVO.getCourseThumbnail().isEmpty()) {
+        if (!requestSaveVO.getCourseThumbnail().isEmpty()) {
             UploadFiles uploadFiles = UploadFiles.builder()
                     .fileData(requestSaveVO.getCourseThumbnail().getBytes())
                     .fileName(requestSaveVO.getCourseThumbnail().getName())
@@ -81,5 +83,27 @@ public class CourseLectureDao {
             entityManager.persist(uploadFiles);
         }
 
+    }
+
+    public List<CourseDto> getCourseList(Integer pageSize, Integer page) {
+        int offset = (page - 1) * pageSize;
+        return jpaQueryFactory.select(Projections.bean(CourseDto.class,
+                        course.courseId
+                        , course.title
+                        , course.courseStartDate
+                        , course.courseEndDate
+                        , course.applyStartDate
+                        , course.applyEndDate
+                        , course.courseStartTime
+                        , course.courseEndTime
+                        , course.maxCapacity
+                        , course.writtenApplicationCount
+                        , course.location
+                        , course.price
+                )).from(course)
+                .orderBy(course.applyStartDate.desc())
+                .limit(pageSize)
+                .offset(offset)
+                .fetch();
     }
 }
