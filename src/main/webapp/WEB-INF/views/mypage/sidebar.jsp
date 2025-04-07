@@ -30,6 +30,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="${contextPath}/course-lecture/course/save">교육과정등록</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${contextPath}/course-lecture/course/manage">교육과정관리</a>
+                        </li>
                     </ul>
                 </li>
             </ul>

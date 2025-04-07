@@ -10,7 +10,12 @@ import com.kosi.util.CourseCategoryType;
 import com.kosi.util.EnrollmentStatus;
 import com.kosi.util.UploadFileType;
 import com.kosi.vo.CourseVO;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -87,10 +92,35 @@ public class CourseLectureDao {
             entityManager.persist(uploadFiles);
         }
 
+        if (!requestSaveVO.getCourseNotice().isEmpty()) {
+            UploadFiles uploadFiles = UploadFiles.builder()
+                    .fileData(requestSaveVO.getCourseNotice().getBytes())
+                    .fileName(requestSaveVO.getCourseNotice().getName())
+                    .postId(saveCourse.getCourseId())
+                    .uploadFileType(UploadFileType.COURSE_NOTICE_FILE)
+                    .build();
+
+            entityManager.persist(uploadFiles);
+        }
+
     }
 
     public List<CourseDto> getCourseList(Integer pageSize, Integer page, CourseCategoryType courseCategoryType, CourseCategory courseCategoryName) {
         int offset = (page - 1) * pageSize;
+
+        JPQLQuery<String> courseThumbnailSubQuery = JPAExpressions.select(
+                        Expressions.stringTemplate(
+                                "function('TO_BASE64', {0})", uploadFiles.fileData
+                        )
+                )
+                .from(uploadFiles)
+                .where(
+                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
+                        uploadFiles.postId.eq(course.courseId)
+                )
+                .limit(1);
+
+
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
                         course.courseId
                         , course.title
@@ -106,9 +136,13 @@ public class CourseLectureDao {
                         , course.price
                         , courseCategory.courseCategoryId
                         , courseCategory.courseCategoryType
+                        , ExpressionUtils.as(courseThumbnailSubQuery, "courseThumbnailBase64")
                 )).from(course)
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
-                .where(courseCategory.courseCategoryType.eq(courseCategoryType.getName()).and(courseCategory.name.eq(courseCategoryName.getCourseCategoryTypeText())))
+                .where(courseCategory.courseCategoryType.eq(courseCategoryType.getName())
+                        .and(courseCategory.name.eq(courseCategoryName.getCourseCategoryTypeText()))
+                        .and(course.isPublished.eq(true))
+                )
                 .orderBy(course.applyStartDate.desc())
                 .limit(pageSize)
                 .offset(offset)
@@ -124,17 +158,91 @@ public class CourseLectureDao {
                 .fetchCount();
     }
 
-    public String getCourseThumbnailByCourseId(Long courseId) {
-        Optional<CourseThumbnailDto> courseThumbnailDto = Optional.ofNullable(jpaQueryFactory.select(Projections.bean(CourseThumbnailDto.class, uploadFiles.fileData))
+    public CourseDto getCourseByCourseId(Long courseId) {
+        return jpaQueryFactory.select(Projections.bean(CourseDto.class,
+                        course.courseId
+                        , course.title
+                        , course.description
+                        , course.courseStartDate
+                        , course.courseEndDate
+                        , course.applyStartDate
+                        , course.applyEndDate
+                        , course.courseStartTime
+                        , course.courseEndTime
+                        , course.maxCapacity
+                        , course.writtenApplicationCount
+                        , course.location
+                        , course.price
+                        , course.registrationPopupMessage
+                        , courseCategory.courseCategoryId
+                        , courseCategory.courseCategoryType
+                        , ExpressionUtils.as(getThumbnailSubquery(courseId), "courseThumbnailBase64")
+                )).from(course)
+                .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
+                .where(course.courseId.eq(courseId)).fetchOne();
+    }
+
+    public static JPQLQuery<String> getThumbnailSubquery(Long courseId){
+        return  JPAExpressions.select(
+                        Expressions.stringTemplate(
+                                "function('TO_BASE64', {0})", uploadFiles.fileData
+                        )
+                )
                 .from(uploadFiles)
-                .where(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL).and(uploadFiles.postId.eq(courseId)))
-                .fetchOne());
-
-        if (!courseThumbnailDto.isPresent())
-            return "";
-
-        return Base64.getEncoder().encodeToString(courseThumbnailDto.get().getFileData());
+                .where(
+                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
+                        uploadFiles.postId.eq(courseId)
+                )
+                .limit(1);
     }
 
 
+    public QueryResults<CourseDto> getCourses(Integer pageSize, Integer page) {
+        int offset = (page - 1) * pageSize;
+
+        JPQLQuery<String> courseThumbnailSubQuery = JPAExpressions.select(
+                        Expressions.stringTemplate(
+                                "function('TO_BASE64', {0})", uploadFiles.fileData
+                        )
+                )
+                .from(uploadFiles)
+                .where(
+                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
+                        uploadFiles.postId.eq(course.courseId)
+                )
+                .limit(1);
+
+        JPQLQuery<Integer> applyEnrollmentCountSubQuery = JPAExpressions
+                .select(Expressions.numberTemplate(Integer.class, "count(*)"))
+                .from(enrollment)
+                .where(
+                        enrollment.course.courseId.eq(course.courseId),
+                        enrollment.status.eq(EnrollmentStatus.APPLY)
+                );
+
+        return jpaQueryFactory.select(Projections.bean(CourseDto.class,
+                        course.courseId
+                        , course.title
+                        , course.courseStartDate
+                        , course.courseEndDate
+                        , course.applyStartDate
+                        , course.applyEndDate
+                        , course.courseStartTime
+                        , course.courseEndTime
+                        , course.maxCapacity
+                        , course.writtenApplicationCount
+                        , course.location
+                        , course.price
+                        , courseCategory.courseCategoryId
+                        , courseCategory.courseCategoryType
+                        , ExpressionUtils.as(courseThumbnailSubQuery, "courseThumbnailBase64")
+                        , ExpressionUtils.as(applyEnrollmentCountSubQuery, "currentEnrollment") // ✅ 추가된 부분
+                )).from(course)
+                .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
+                .where()
+                .orderBy(course.createdAt.desc())
+                .limit(pageSize)
+                .offset(offset)
+                .fetchResults();
+    }
 }

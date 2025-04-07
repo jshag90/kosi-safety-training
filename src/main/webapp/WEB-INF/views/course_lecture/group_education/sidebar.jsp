@@ -41,15 +41,15 @@
     $(document).ready(function() {
         // 현재 페이지의 URL을 가져옵니다.
         var currentUrl = window.location.pathname;
-        console.log(currentUrl);
+        console.log("Current URL:", currentUrl);
 
         // URL에 맞는 메뉴 항목을 active로 설정
         $('.nav-link').each(function() {
             // 각 메뉴 항목의 링크 경로를 가져옵니다.
             var linkUrl = $(this).attr('href');
 
-            // 현재 페이지의 URL과 메뉴 항목의 URL이 일치하면 active 클래스를 추가
-            if (currentUrl === linkUrl) {
+            // 현재 URL이 메뉴 항목의 URL로 시작하면 active 클래스를 추가
+            if (currentUrl.startsWith(linkUrl)) {
                 $(this).addClass('active');
             }
         });

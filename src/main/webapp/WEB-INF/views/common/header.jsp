@@ -125,6 +125,7 @@
                 <li><a class="dropdown-item" href="#!">수강신청 내역</a></li>
                 <li><a class="dropdown-item" href="#!">수료증발급</a></li>
                 <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/save">교육과정등록(관리자용)</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/manage">교육과정관리(관리자용)</a></li>
               </ul>
             </li>
           </ul>

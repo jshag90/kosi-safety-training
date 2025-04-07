@@ -29,6 +29,7 @@ public class CourseVO {
         private String courseDescription;
         private String popupNotice;
         private MultipartFile courseThumbnail;
+        private MultipartFile courseNotice;
     }
 
 

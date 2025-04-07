@@ -3,11 +3,14 @@ package com.kosi.service;
 import com.kosi.dao.CourseLectureDao;
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
+import com.kosi.dto.ListResp;
+import com.kosi.dto.NoticeDto;
 import com.kosi.util.CourseCategory;
 import com.kosi.util.CourseCategoryType;
 import com.kosi.util.CourseStatus;
 import com.kosi.util.DateUtil;
 import com.kosi.vo.CourseVO;
+import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +64,7 @@ public class CourseLectureService {
                     .price(courseDto.getPrice())
                     .courseStatus(getCourseStatusByCourseDto(currentEnrollment, courseDto))
                     .courseCategoryId(courseDto.getCourseCategoryId())
-                    .courseThumbnailBase64(courseLectureDao.getCourseThumbnailByCourseId(courseId))
+                    .courseThumbnailBase64(courseDto.getCourseThumbnailBase64())
                     .build();
 
             handleCourseList.add(handleCourseDto);
@@ -90,5 +93,30 @@ public class CourseLectureService {
 
         int totalMinute = (diffDayStartDateAndEndDate + 1) * diffTimeStartTimeAndEndTime;
         return DateUtil.formatMinutesToDaysHoursMinutes(totalMinute);
+    }
+
+    public CourseDto getCourseByCourseId(Long courseId){
+        CourseDto courseDtoByCourseId = courseLectureDao.getCourseByCourseId(courseId);
+        courseDtoByCourseId.setCourseQuestion(courseQuestion);
+        courseDtoByCourseId.setCourseTimeSum(getCourseTimeSumByCourseDto(courseDtoByCourseId));
+
+        Integer currentApplyCount = courseLectureDao.getApplyEnrollmentCountByCourseId(courseId).intValue();
+        int currentEnrollment = currentApplyCount + courseDtoByCourseId.getWrittenApplicationCount();
+
+        courseDtoByCourseId.setCurrentEnrollment(currentEnrollment);
+        courseDtoByCourseId.setCourseStatus(getCourseStatusByCourseDto(currentEnrollment, courseDtoByCourseId));
+        return courseDtoByCourseId;
+    }
+
+    public ListResp<CourseDto> getCourses(Integer pageSize, Integer page) {
+        QueryResults<CourseDto> courseDtoQueryResults = courseLectureDao.getCourses(pageSize, page);
+
+        long totalCount = courseDtoQueryResults.getTotal();
+        return ListResp.<CourseDto>builder()
+                .list(courseDtoQueryResults.getResults())
+                .total((int) totalCount)
+                .currPg(page)
+                .lastPg((int) ((totalCount/pageSize)+1))
+                .build();
     }
 }

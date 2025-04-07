@@ -17,6 +17,8 @@ public class CourseDto {
 
     String title;
 
+    String description;
+
     LocalDate courseStartDate;
     LocalDate courseEndDate;
     LocalDate applyStartDate;
@@ -36,7 +38,6 @@ public class CourseDto {
 
     Integer currentEnrollment;
 
-    @JsonIgnore
     Integer writtenApplicationCount;
 
     String location;
@@ -51,5 +52,7 @@ public class CourseDto {
     String courseCategoryType;
 
     String courseThumbnailBase64;
+
+    String registrationPopupMessage;
 
 }

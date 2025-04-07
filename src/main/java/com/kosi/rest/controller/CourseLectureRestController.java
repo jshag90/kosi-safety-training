@@ -2,12 +2,14 @@ package com.kosi.rest.controller;
 
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
+import com.kosi.dto.ListResp;
 import com.kosi.service.CourseLectureService;
 import com.kosi.util.CourseCategory;
 import com.kosi.util.CourseCategoryType;
 import com.kosi.util.ErrorCode;
 import com.kosi.vo.CourseVO;
 import com.kosi.vo.ResultVO;
+import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -64,6 +66,22 @@ public class CourseLectureRestController {
 
         List<CourseDto> courseDtoList = courseLectureService.getCourseList(pageSize, page, courseCategoryType, courseCategory);
         ResultVO<List<CourseDto>> resultVO = ResultVO.<List<CourseDto>>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(courseDtoList)
+                .build();
+
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping("/courses")
+    public ResponseEntity<ResultVO<ListResp<CourseDto>>> getCourses(
+            @RequestParam("pageSize") Integer pageSize,
+            @RequestParam("page") Integer page
+    ) {
+
+        ListResp<CourseDto> courseDtoList = courseLectureService.getCourses(pageSize, page);
+        ResultVO<ListResp<CourseDto>> resultVO = ResultVO.<ListResp<CourseDto>>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
                 .data(courseDtoList)

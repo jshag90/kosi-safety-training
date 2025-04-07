@@ -56,7 +56,7 @@
                       class="form-check-input"
                       id="visibleYes"
                       name="visibility"
-                      value="yes"
+                      value="Y"
                       required
                       checked
                     />
@@ -70,7 +70,7 @@
                       class="form-check-input"
                       id="visibleNo"
                       name="visibility"
-                      value="no"
+                      value="N"
                       required
                     />
                     <label class="form-check-label" for="visibleNo"
@@ -100,6 +100,18 @@
                   id="courseName"
                   name="courseName"
                   placeholder="교육명을 입력하세요."
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="courseThumbnail">교육썸네일</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="courseThumbnail"
+                  name="courseThumbnail"
+                  accept="image/*"
                   required
                 />
               </div>
@@ -239,14 +251,15 @@
                 ></textarea>
               </div>
 
+              <!-- 안내 공문 등록 -->
               <div class="form-group">
-                <label for="courseThumbnail">교육썸네일</label>
+                <label for="courseNotice">안내 공문</label>
                 <input
                   type="file"
                   class="form-control"
-                  id="courseThumbnail"
-                  name="courseThumbnail"
-                  accept="image/*"
+                  id="courseNotice"
+                  name="courseNotice"
+                  accept=".pdf,.doc,.docx,.xlsx,.hwp,.hwpx"
                   required
                 />
               </div>
@@ -396,6 +409,7 @@
         const formData = new FormData(form); // Create a FormData object from the form
 
         const visibility = $('input[name="visibility"]:checked').val();
+        console.log("Selected visibility:", visibility);
         formData.append("isPublished", visibility);
 
         console.log("Form Data:");
