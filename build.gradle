@@ -27,6 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.mariadb.jdbc:mariadb-java-client'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-tomcat'  // Tomcat 의존성
     implementation 'javax.servlet:jstl'  // JSTL 의존성 추가
     compileOnly 'org.projectlombok:lombok'
