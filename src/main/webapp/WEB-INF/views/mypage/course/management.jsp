@@ -233,7 +233,12 @@
           searching: false,
           columns: [
             { data: "courseId" }, // ID
-            { data: "title" }, // 교육과정명
+            {
+              data: "title", // 교육과정명
+              render: function (data, type, row) {
+                return "<a href='#' onclick=\"openEditCourseModal('" + row.courseId + "')\">" + row.title + "</a>";
+              },
+            },
             { data: "maxCapacity" }, // 모집인원
             { data: "currentEnrollment" }, // 신청인원
             { data: "writtenApplicationCount" }, // 서명신청인원
@@ -422,6 +427,27 @@
               });
           }
         });
+      }
+
+      function openEditCourseModal(courseId) {
+        // 서버에 axios 요청
+        axios.get(`${contextPath}/course-lecture/course?courseId=` + courseId)
+            .then(function (response) {
+                const courseData = response.data.data; // 서버에서 반환된 데이터
+
+                // 서버에서 가져온 데이터로 모달에 채우기
+                $("#courseTitle").val(courseData.title);
+                $("#courseDescription").val(courseData.description);
+                $("#courseStartDate").val(courseData.courseStartDate);
+                $("#courseEndDate").val(courseData.courseEndDate);
+
+                // 모달 표시
+                $("#editCourseModal").modal("show");
+            })
+            .catch(function (error) {
+                console.error("강의 정보를 가져오는 데 실패했습니다:", error);
+                Swal.fire("오류", "강의 정보를 가져오는 데 실패했습니다.", "error");
+            });
       }
     </script>
   </body>

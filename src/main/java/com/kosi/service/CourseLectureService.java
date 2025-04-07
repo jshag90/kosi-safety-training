@@ -116,4 +116,8 @@ public class CourseLectureService {
     public void deleteCourseById(Long courseId) {
         courseLectureDao.deleteCourseById(courseId);
     }
+
+    public CourseDto getCourseById(Long courseId) {
+        return courseLectureDao.getCourseByCourseId(courseId);
+    }
 }

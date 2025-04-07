@@ -100,5 +100,22 @@ public class CourseLectureRestController {
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @GetMapping("/course")
+    public ResponseEntity<ResultVO<CourseDto>> getCourse(
+            @RequestParam("courseId") Long courseId
+    ) {
+
+        CourseDto courseDto = courseLectureService.getCourseById(courseId);
+        ResultVO<CourseDto> courseDtoResultVO = ResultVO.<CourseDto>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(courseDto)
+                .build();
+
+        return new ResponseEntity<>(courseDtoResultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
+
+
 
 }
