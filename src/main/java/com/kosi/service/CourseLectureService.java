@@ -119,4 +119,9 @@ public class CourseLectureService {
                 .lastPg((int) ((totalCount/pageSize)+1))
                 .build();
     }
+
+    @Transactional
+    public void deleteCourseById(Long courseId) {
+        courseLectureDao.deleteCourseById(courseId);
+    }
 }

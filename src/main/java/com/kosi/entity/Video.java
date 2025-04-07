@@ -26,4 +26,8 @@ public class Video {
     @Column(nullable = false, length = 500)
     private String filePath;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lectureId", nullable = false)
+    private Lecture lecture;
+
 }

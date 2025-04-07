@@ -33,6 +33,8 @@ import static com.kosi.entity.QCourseCategory.courseCategory;
 import static com.kosi.entity.QCourse.course;
 import static com.kosi.entity.QEnrollment.enrollment;
 import static com.kosi.entity.QUploadFiles.uploadFiles;
+import static com.kosi.entity.QLecture.lecture;
+import static com.kosi.entity.QVideo.video;
 
 @Repository
 @RequiredArgsConstructor
@@ -42,6 +44,20 @@ public class CourseLectureDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    public static JPQLQuery<String> getThumbnailSubquery(Long courseId) {
+        return JPAExpressions.select(
+                        Expressions.stringTemplate(
+                                "function('TO_BASE64', {0})", uploadFiles.fileData
+                        )
+                )
+                .from(uploadFiles)
+                .where(
+                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
+                        uploadFiles.postId.eq(courseId)
+                )
+                .limit(1);
+    }
 
     public List<CourseCategoryDto> getCourseCategory() {
         return jpaQueryFactory.select(
@@ -149,7 +165,6 @@ public class CourseLectureDao {
                 .fetch();
     }
 
-
     public Long getApplyEnrollmentCountByCourseId(Long courseId) {
         return jpaQueryFactory.selectFrom(enrollment)
                 .innerJoin(course).on(enrollment.course.courseId.eq(course.courseId))
@@ -181,21 +196,6 @@ public class CourseLectureDao {
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
                 .where(course.courseId.eq(courseId)).fetchOne();
     }
-
-    public static JPQLQuery<String> getThumbnailSubquery(Long courseId){
-        return  JPAExpressions.select(
-                        Expressions.stringTemplate(
-                                "function('TO_BASE64', {0})", uploadFiles.fileData
-                        )
-                )
-                .from(uploadFiles)
-                .where(
-                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
-                        uploadFiles.postId.eq(courseId)
-                )
-                .limit(1);
-    }
-
 
     public QueryResults<CourseDto> getCourses(Integer pageSize, Integer page) {
         int offset = (page - 1) * pageSize;
@@ -244,5 +244,22 @@ public class CourseLectureDao {
                 .limit(pageSize)
                 .offset(offset)
                 .fetchResults();
+    }
+
+    public void deleteCourseById(Long courseId) {
+        // 1. 삭제될 lecture ID 목록 조회
+        List<Long> deletedLectureIds = jpaQueryFactory
+                .select(lecture.lectureId)
+                .from(lecture)
+                .where(lecture.course.courseId.eq(courseId))
+                .fetch();
+
+        jpaQueryFactory.delete(video).where(video.lecture.lectureId.in(deletedLectureIds)).execute();
+        jpaQueryFactory.delete(lecture).where(lecture.course.courseId.eq(courseId)).execute();
+
+        jpaQueryFactory.delete(course).where(course.courseId.eq(courseId)).execute();
+        jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_NOTICE_FILE)));
+        jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL)));
+
     }
 }

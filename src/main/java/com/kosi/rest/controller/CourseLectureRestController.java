@@ -90,5 +90,15 @@ public class CourseLectureRestController {
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @DeleteMapping("/courses")
+    public ResponseEntity<ResultVO<Void>> deleteCourseById(@RequestParam("courseId") Long courseId){
+        courseLectureService.deleteCourseById(courseId);
+        ResultVO<Void> resultVO = ResultVO.<Void>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .build();
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
 
 }
