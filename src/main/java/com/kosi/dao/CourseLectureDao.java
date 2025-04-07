@@ -2,7 +2,6 @@ package com.kosi.dao;
 
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
-import com.kosi.dto.CourseThumbnailDto;
 import com.kosi.entity.Course;
 import com.kosi.entity.UploadFiles;
 import com.kosi.util.CourseCategory;
@@ -14,6 +13,7 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -45,18 +45,24 @@ public class CourseLectureDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public static JPQLQuery<String> getThumbnailSubquery(Long courseId) {
-        return JPAExpressions.select(
-                        Expressions.stringTemplate(
-                                "function('TO_BASE64', {0})", uploadFiles.fileData
-                        )
-                )
+    private static final StringTemplate toBase64StringTemplate = Expressions.stringTemplate("function('TO_BASE64', {0})", uploadFiles.fileData);
+
+    private static JPQLQuery<String> getCourseThumbnailSubQuery() {
+        return JPAExpressions.select(toBase64StringTemplate)
                 .from(uploadFiles)
-                .where(
-                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
-                        uploadFiles.postId.eq(courseId)
-                )
+                .where(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
+                        uploadFiles.postId.eq(course.courseId))
                 .limit(1);
+    }
+
+    private static JPQLQuery<Integer> getEnrollmentCountSubQuery(){
+        return JPAExpressions
+                .select(Expressions.numberTemplate(Integer.class, "count(*)"))
+                .from(enrollment)
+                .where(
+                        enrollment.course.courseId.eq(course.courseId),
+                        enrollment.status.eq(EnrollmentStatus.APPLY)
+                );
     }
 
     public List<CourseCategoryDto> getCourseCategory() {
@@ -68,6 +74,7 @@ public class CourseLectureDao {
                 )
         ).from(courseCategory).fetch();
     }
+
 
     @Transactional
     public void saveCourse(CourseVO.RequestSaveVO requestSaveVO) throws IOException {
@@ -124,19 +131,6 @@ public class CourseLectureDao {
     public List<CourseDto> getCourseList(Integer pageSize, Integer page, CourseCategoryType courseCategoryType, CourseCategory courseCategoryName) {
         int offset = (page - 1) * pageSize;
 
-        JPQLQuery<String> courseThumbnailSubQuery = JPAExpressions.select(
-                        Expressions.stringTemplate(
-                                "function('TO_BASE64', {0})", uploadFiles.fileData
-                        )
-                )
-                .from(uploadFiles)
-                .where(
-                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
-                        uploadFiles.postId.eq(course.courseId)
-                )
-                .limit(1);
-
-
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
                         course.courseId
                         , course.title
@@ -152,7 +146,8 @@ public class CourseLectureDao {
                         , course.price
                         , courseCategory.courseCategoryId
                         , courseCategory.courseCategoryType
-                        , ExpressionUtils.as(courseThumbnailSubQuery, "courseThumbnailBase64")
+                        , ExpressionUtils.as(getCourseThumbnailSubQuery(), "courseThumbnailBase64")
+                        , ExpressionUtils.as(getEnrollmentCountSubQuery(), "currentEnrollment")
                 )).from(course)
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
                 .where(courseCategory.courseCategoryType.eq(courseCategoryType.getName())
@@ -163,14 +158,6 @@ public class CourseLectureDao {
                 .limit(pageSize)
                 .offset(offset)
                 .fetch();
-    }
-
-    public Long getApplyEnrollmentCountByCourseId(Long courseId) {
-        return jpaQueryFactory.selectFrom(enrollment)
-                .innerJoin(course).on(enrollment.course.courseId.eq(course.courseId))
-                .where(course.courseId.eq(courseId)
-                        .and(enrollment.status.eq(EnrollmentStatus.APPLY)))
-                .fetchCount();
     }
 
     public CourseDto getCourseByCourseId(Long courseId) {
@@ -191,7 +178,8 @@ public class CourseLectureDao {
                         , course.registrationPopupMessage
                         , courseCategory.courseCategoryId
                         , courseCategory.courseCategoryType
-                        , ExpressionUtils.as(getThumbnailSubquery(courseId), "courseThumbnailBase64")
+                        , ExpressionUtils.as(getCourseThumbnailSubQuery(), "courseThumbnailBase64")
+                        , ExpressionUtils.as(getEnrollmentCountSubQuery(), "currentEnrollment")
                 )).from(course)
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
                 .where(course.courseId.eq(courseId)).fetchOne();
@@ -199,26 +187,6 @@ public class CourseLectureDao {
 
     public QueryResults<CourseDto> getCourses(Integer pageSize, Integer page) {
         int offset = (page - 1) * pageSize;
-
-        JPQLQuery<String> courseThumbnailSubQuery = JPAExpressions.select(
-                        Expressions.stringTemplate(
-                                "function('TO_BASE64', {0})", uploadFiles.fileData
-                        )
-                )
-                .from(uploadFiles)
-                .where(
-                        uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
-                        uploadFiles.postId.eq(course.courseId)
-                )
-                .limit(1);
-
-        JPQLQuery<Integer> applyEnrollmentCountSubQuery = JPAExpressions
-                .select(Expressions.numberTemplate(Integer.class, "count(*)"))
-                .from(enrollment)
-                .where(
-                        enrollment.course.courseId.eq(course.courseId),
-                        enrollment.status.eq(EnrollmentStatus.APPLY)
-                );
 
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
                         course.courseId
@@ -235,8 +203,8 @@ public class CourseLectureDao {
                         , course.price
                         , courseCategory.courseCategoryId
                         , courseCategory.courseCategoryType
-                        , ExpressionUtils.as(courseThumbnailSubQuery, "courseThumbnailBase64")
-                        , ExpressionUtils.as(applyEnrollmentCountSubQuery, "currentEnrollment") // ✅ 추가된 부분
+                        , ExpressionUtils.as(getCourseThumbnailSubQuery(), "courseThumbnailBase64")
+                        , ExpressionUtils.as(getEnrollmentCountSubQuery(), "currentEnrollment")
                 )).from(course)
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
                 .where()
@@ -257,6 +225,7 @@ public class CourseLectureDao {
         jpaQueryFactory.delete(video).where(video.lecture.lectureId.in(deletedLectureIds)).execute();
         jpaQueryFactory.delete(lecture).where(lecture.course.courseId.eq(courseId)).execute();
 
+        jpaQueryFactory.delete(enrollment).where(enrollment.course.courseId.eq(courseId)).execute();
         jpaQueryFactory.delete(course).where(course.courseId.eq(courseId)).execute();
         jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_NOTICE_FILE)));
         jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL)));

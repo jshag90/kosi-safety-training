@@ -45,8 +45,7 @@ public class CourseLectureService {
         for (CourseDto courseDto : courseList) {
             Long courseId = courseDto.getCourseId();
 
-            Integer currentApplyCount = courseLectureDao.getApplyEnrollmentCountByCourseId(courseId).intValue();
-            int currentEnrollment = currentApplyCount + courseDto.getWrittenApplicationCount(); //신청 사용자 + 서명 등록 사용자 수
+            int currentEnrollment = courseDto.getCurrentEnrollment() + courseDto.getWrittenApplicationCount(); //신청 사용자 + 서명 등록 사용자 수
 
             CourseDto handleCourseDto = CourseDto.builder()
                     .courseId(courseId)
@@ -100,8 +99,7 @@ public class CourseLectureService {
         courseDtoByCourseId.setCourseQuestion(courseQuestion);
         courseDtoByCourseId.setCourseTimeSum(getCourseTimeSumByCourseDto(courseDtoByCourseId));
 
-        Integer currentApplyCount = courseLectureDao.getApplyEnrollmentCountByCourseId(courseId).intValue();
-        int currentEnrollment = currentApplyCount + courseDtoByCourseId.getWrittenApplicationCount();
+        int currentEnrollment = courseDtoByCourseId.getCurrentEnrollment() + courseDtoByCourseId.getWrittenApplicationCount();
 
         courseDtoByCourseId.setCurrentEnrollment(currentEnrollment);
         courseDtoByCourseId.setCourseStatus(getCourseStatusByCourseDto(currentEnrollment, courseDtoByCourseId));
