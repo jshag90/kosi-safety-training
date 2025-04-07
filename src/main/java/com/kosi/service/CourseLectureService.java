@@ -4,11 +4,7 @@ import com.kosi.dao.CourseLectureDao;
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
 import com.kosi.dto.ListResp;
-import com.kosi.dto.NoticeDto;
-import com.kosi.util.CourseCategory;
-import com.kosi.util.CourseCategoryType;
-import com.kosi.util.CourseStatus;
-import com.kosi.util.DateUtil;
+import com.kosi.util.*;
 import com.kosi.vo.CourseVO;
 import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
@@ -100,7 +96,6 @@ public class CourseLectureService {
         courseDtoByCourseId.setCourseTimeSum(getCourseTimeSumByCourseDto(courseDtoByCourseId));
 
         int currentEnrollment = courseDtoByCourseId.getCurrentEnrollment() + courseDtoByCourseId.getWrittenApplicationCount();
-
         courseDtoByCourseId.setCurrentEnrollment(currentEnrollment);
         courseDtoByCourseId.setCourseStatus(getCourseStatusByCourseDto(currentEnrollment, courseDtoByCourseId));
         return courseDtoByCourseId;
@@ -108,13 +103,12 @@ public class CourseLectureService {
 
     public ListResp<CourseDto> getCourses(Integer pageSize, Integer page) {
         QueryResults<CourseDto> courseDtoQueryResults = courseLectureDao.getCourses(pageSize, page);
-
         long totalCount = courseDtoQueryResults.getTotal();
         return ListResp.<CourseDto>builder()
                 .list(courseDtoQueryResults.getResults())
                 .total((int) totalCount)
                 .currPg(page)
-                .lastPg((int) ((totalCount/pageSize)+1))
+                .lastPg(PagingUtil.getLastPage((int) totalCount, pageSize))
                 .build();
     }
 

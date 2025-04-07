@@ -4,10 +4,7 @@ import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
 import com.kosi.entity.Course;
 import com.kosi.entity.UploadFiles;
-import com.kosi.util.CourseCategory;
-import com.kosi.util.CourseCategoryType;
-import com.kosi.util.EnrollmentStatus;
-import com.kosi.util.UploadFileType;
+import com.kosi.util.*;
 import com.kosi.vo.CourseVO;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.ExpressionUtils;
@@ -129,7 +126,6 @@ public class CourseLectureDao {
     }
 
     public List<CourseDto> getCourseList(Integer pageSize, Integer page, CourseCategoryType courseCategoryType, CourseCategory courseCategoryName) {
-        int offset = (page - 1) * pageSize;
 
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
                         course.courseId
@@ -156,7 +152,7 @@ public class CourseLectureDao {
                 )
                 .orderBy(course.applyStartDate.desc())
                 .limit(pageSize)
-                .offset(offset)
+                .offset(PagingUtil.getOffset(page, pageSize))
                 .fetch();
     }
 
@@ -186,8 +182,6 @@ public class CourseLectureDao {
     }
 
     public QueryResults<CourseDto> getCourses(Integer pageSize, Integer page) {
-        int offset = (page - 1) * pageSize;
-
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
                         course.courseId
                         , course.title
@@ -210,7 +204,7 @@ public class CourseLectureDao {
                 .where()
                 .orderBy(course.createdAt.desc())
                 .limit(pageSize)
-                .offset(offset)
+                .offset(PagingUtil.getOffset(page, pageSize))
                 .fetchResults();
     }
 
