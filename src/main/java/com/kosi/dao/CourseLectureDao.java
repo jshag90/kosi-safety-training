@@ -195,6 +195,7 @@ public class CourseLectureDao {
                         , course.writtenApplicationCount
                         , course.location
                         , course.price
+                        , course.isPublished
                         , courseCategory.courseCategoryId
                         , courseCategory.courseCategoryType
                         , ExpressionUtils.as(getCourseThumbnailSubQuery(), "courseThumbnailBase64")
@@ -223,6 +224,16 @@ public class CourseLectureDao {
         jpaQueryFactory.delete(course).where(course.courseId.eq(courseId)).execute();
         jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_NOTICE_FILE)));
         jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL)));
+
+    }
+
+    public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) {
+        jpaQueryFactory.update(course).set(course.title, requestUpdateVO.getCourseName())
+                .set(course.description, requestUpdateVO.getCourseDescription())
+                .set(course.courseStartDate, LocalDate.parse(requestUpdateVO.getStartDate()))
+                .set(course.courseEndDate, LocalDate.parse(requestUpdateVO.getEndDate()))
+                .where(course.courseId.eq(requestUpdateVO.getCourseId()))
+                .execute();
 
     }
 }

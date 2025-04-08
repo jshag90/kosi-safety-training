@@ -56,6 +56,7 @@
                 <tr>
                   <th>ID</th>
                   <th>교육과정명</th>
+                  <th>노출여부</th>
                   <th>모집인원</th>
                   <th>신청인원</th>
                   <th>서명신청인원</th>
@@ -72,7 +73,6 @@
       </div>
     </div>
 
-    <!-- Modal HTML 추가 -->
     <div
       class="modal fade"
       id="editCourseModal"
@@ -99,7 +99,7 @@
                   type="text"
                   class="form-control"
                   id="courseTitle"
-                  name="title"
+                  name="courseName"
                 />
               </div>
               <div class="mb-3">
@@ -107,7 +107,7 @@
                 <textarea
                   class="form-control"
                   id="courseDescription"
-                  name="description"
+                  name="courseDescription"
                 ></textarea>
               </div>
               <div class="mb-3">
@@ -132,6 +132,26 @@
                   name="endDate"
                 />
               </div>
+              <div class="mb-3">
+                <label for="courseThumbnail" class="form-label">썸네일</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="courseThumbnail"
+                  name="courseThumbnail"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="courseNotice" class="form-label">공지사항 파일</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="courseNotice"
+                  name="courseNotice"
+                />
+              </div>
+              
+              <input type="hidden" id="courseId" name="courseId" value="${courseId}"/>
             </form>
           </div>
           <div class="modal-footer">
@@ -146,8 +166,9 @@
               type="button"
               class="btn btn-primary"
               id="saveCourseChanges"
+              onclick="updateCourseChanges()"
             >
-              저장
+              수정
             </button>
           </div>
         </div>
@@ -180,6 +201,7 @@
               <thead>
                 <tr>
                   <th>강의 ID</th>
+                  <th>노출여부</th>
                   <th>강의명</th>
                   <th>강의 시작일</th>
                   <th>강의 종료일</th>
@@ -206,196 +228,7 @@
     <%@include file ="../../common/footer.jsp" %>
     <script>
       $(document).ready(function () {
-        // DataTables 초기화
-        const table = $("#courseTable").DataTable({
-          ajax: {
-            url: "${contextPath}/course-lecture/courses", // API 엔드포인트
-            type: "GET",
-            data: function (d) {
-              // DataTables의 기본 파라미터를 서버 요구사항에 맞게 변환
-              d.page = d.start / d.length + 1; // DataTables의 start를 page로 변환
-              d.pageSize = d.length; // DataTables의 length를 pageSize로 변환
-            },
-            dataSrc: function (json) {
-              console.log("서버 응답 데이터:", json);
-              if (json.returnCode !== 0) {
-                alert("공지사항 데이터를 불러오는 데 실패했습니다.");
-                return [];
-              }
-              json.recordsTotal = json.data.total;
-              json.recordsFiltered = json.data.total;
-              return json.data.list;
-            },
-          },
-          serverSide: true, // 서버 사이드 처리 활성화
-          processing: true, // 로딩 표시 활성화
-          ordering: false,
-          searching: false,
-          columns: [
-            { data: "courseId" }, // ID
-            {
-              data: "title", // 교육과정명
-              render: function (data, type, row) {
-                return "<a href='#' onclick=\"openEditCourseModal('" + row.courseId + "')\">" + row.title + "</a>";
-              },
-            },
-            { data: "maxCapacity" }, // 모집인원
-            { data: "currentEnrollment" }, // 신청인원
-            { data: "writtenApplicationCount" }, // 서명신청인원
-            {
-              data: null,
-              render: function (data, type, row) {
-                return (
-                  "<button class='btn btn-sm btn-danger' onclick=\"deleteCourse('" +
-                  row.courseId +
-                  "')\">삭제</button>"
-                );
-              },
-            },
-            {
-              data: null, // 강의관리 버튼
-              render: function (data, type, row) {
-                return `
-                  <button class="btn btn-sm btn-primary" data-id="${row.courseId}">관리</button>
-                `;
-              },
-            },
-          ],
-          language: {
-            info: "총 _TOTAL_개의 교육과정 중 _START_부터 _END_까지 표시", // 전체 갯수 표시
-            infoEmpty: "표시할 데이터가 없습니다.", // 데이터가 없을 때 표시
-            infoFiltered: "(총 _MAX_개의 데이터에서 필터링됨)", // 필터링된 데이터 정보
-            paginate: {
-              first: "처음", // "처음" 버튼 텍스트
-              last: "마지막", // "마지막" 버튼 텍스트
-              next: "다음", // "다음" 버튼 텍스트
-              previous: "이전", // "이전" 버튼 텍스트
-            },
-          },
-        });
-
-        // 교육과정명 클릭 이벤트
-        $("#courseTable").on("click", ".edit-course-title", function (e) {
-          e.preventDefault();
-
-          // 데이터 가져오기
-          const courseId = $(this).data("id");
-          const title = $(this).data("title");
-          const description = $(this).data("description");
-          const startDate = $(this).data("start-date");
-          const endDate = $(this).data("end-date");
-
-          // 모달에 데이터 채우기
-          $("#courseTitle").val(title);
-          $("#courseDescription").val(description);
-          $("#courseStartDate").val(startDate);
-          $("#courseEndDate").val(endDate);
-
-          // 모달 표시
-          $("#editCourseModal").modal("show");
-        });
-
-        // 저장 버튼 클릭 이벤트
-        $("#saveCourseChanges").on("click", function () {
-          const updatedData = {
-            title: $("#courseTitle").val(),
-            description: $("#courseDescription").val(),
-            startDate: $("#courseStartDate").val(),
-            endDate: $("#courseEndDate").val(),
-          };
-
-          // 서버로 수정 요청 보내기 (예: AJAX 요청)
-          console.log("수정된 데이터:", updatedData);
-
-          // 모달 닫기
-          $("#editCourseModal").modal("hide");
-
-          // 테이블 갱신
-          table.ajax.reload();
-        });
-
-        // 삭제 버튼 클릭 이벤트
-        $("#courseTable").on("click", ".delete-course", function () {
-          const courseId = $(this).data("courseId");
-          Swal.fire({
-            title: "교육과정을 삭제하시겠습니까?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "예",
-            cancelButtonText: "아니오",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // axios를 이용한 DELETE 요청
-              axios
-                .delete(
-                  "${contextPath}/course-lecture/courses?courseId=" + courseId
-                )
-                .then((response) => {
-                  Swal.fire(
-                    "삭제 완료",
-                    "교육과정이 삭제되었습니다.",
-                    "success"
-                  );
-                  table.ajax.reload(); // 테이블 데이터 갱신
-                })
-                .catch((error) => {
-                  console.error("삭제 실패:", error);
-                  Swal.fire(
-                    "삭제 실패",
-                    "교육과정을 삭제할 수 없습니다.",
-                    "error"
-                  );
-                });
-            }
-          });
-        });
-
-        // 강의관리 버튼 클릭 이벤트
-        $("#courseTable").on("click", ".btn-primary", function () {
-          const courseId = $(this).data("id");
-          $("#lectureManagementModal").modal("show");
-          // 강의 데이터를 서버에서 가져오기
-          /*      $.ajax({
-            url: `${contextPath}/api/courses/${courseId}/lectures`, // 강의 조회 API 엔드포인트
-            type: "GET",
-            success: function (response) {
-              if (response.returnCode === 0) {
-                const lectures = response.data; // 강의 데이터 배열
-                const lectureTableBody = $("#lectureTable tbody");
-                lectureTableBody.empty(); // 기존 데이터를 초기화
-
-                // 강의 데이터를 테이블에 추가
-                lectures.forEach((lecture) => {
-                  const row = `
-                    <tr>
-                      <td>${lecture.lectureId}</td>
-                      <td>${lecture.title}</td>
-                      <td>${lecture.startDate}</td>
-                      <td>${lecture.endDate}</td>
-                    </tr>
-                  `;
-                  lectureTableBody.append(row);
-                });
-
-                // 모달 표시
-                $("#lectureManagementModal").modal("show");
-              } else {
-                Swal.fire(
-                  "오류",
-                  "강의 데이터를 불러오는 데 실패했습니다.",
-                  "error"
-                );
-              }
-            },
-            error: function () {
-              Swal.fire(
-                "오류",
-                "강의 데이터를 불러오는 데 실패했습니다.",
-                "error"
-              );
-            },
-          }); */
-        });
+        initCourseTable();
       });
 
       function deleteCourse(courseId) {
@@ -407,32 +240,155 @@
           cancelButtonText: "아니오",
         }).then((result) => {
           if (result.isConfirmed) {
-            // axios를 이용한 DELETE 요청
             axios
-              .delete(
-                `${contextPath}/course-lecture/courses?courseId=` + courseId
-              )
-              .then((response) => {
-                Swal.fire("삭제 완료", "교육과정이 삭제되었습니다.", "success");
-                // DataTables 테이블 갱신
-                $("#courseTable").DataTable().ajax.reload();
-              })
-              .catch((error) => {
-                console.error("삭제 실패:", error);
-                Swal.fire(
-                  "삭제 실패",
-                  "교육과정을 삭제할 수 없습니다.",
-                  "error"
-                );
-              });
+                .delete(`${contextPath}/course-lecture/courses?courseId=` + courseId)
+                .then((response) => {
+                    Swal.fire("삭제 완료", "교육과정이 삭제되었습니다.", "success");
+                    $("#courseTable").DataTable().ajax.reload(); // 테이블 데이터 갱신
+                })
+                .catch((error) => {
+                    console.error("삭제 실패:", error);
+                    Swal.fire(
+                        "삭제 실패",
+                        "교육과정을 삭제할 수 없습니다.",
+                        "error"
+                    );
+                });
           }
         });
       }
 
       function openEditCourseModal(courseId) {
-        // 서버에 axios 요청
+
         axios.get(`${contextPath}/course-lecture/course?courseId=` + courseId)
             .then(function (response) {
+                const courseData = response.data.data;
+             
+                $("#courseTitle").val(courseData.title);
+                $("#courseDescription").val(courseData.description);
+                $("#courseStartDate").val(courseData.courseStartDate);
+                $("#courseEndDate").val(courseData.courseEndDate);
+         
+                $("#editCourseModal").modal("show");
+            })
+            .catch(function (error) {
+                console.error("강의 정보를 가져오는 데 실패했습니다:", error);
+                Swal.fire("오류", "강의 정보를 가져오는 데 실패했습니다.", "error");
+            });
+      }
+
+      function updateCourseChanges() {
+        const form = $("#editCourseForm")[0];
+        const formData = new FormData(form);
+
+        console.log("TEST :", JSON.stringify(formData));
+        
+        axios.put(`${contextPath}/course-lecture/course`, formData, {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+                },
+              })
+              .then(function (response) {
+                  Swal.fire("수정 완료", "교육과정이 성공적으로 수정되었습니다.", "success");
+                  $("#editCourseModal").modal("hide");
+                  $("#courseTable").DataTable().ajax.reload();
+              })
+              .catch(function (error) {
+                  console.error("수정 실패:", error);
+                  Swal.fire("오류", "교육과정을 수정하는 데 실패했습니다.", "error");
+              });
+      }
+
+      function initCourseTable() {
+        const courseDataTable = $("#courseTable").DataTable({
+            ajax: {
+                url: `${contextPath}/course-lecture/courses`,
+                type: "GET",
+                data: function (d) {
+                    d.page = d.start / d.length + 1;
+                    d.pageSize = d.length;
+                },
+                dataSrc: function (json) {
+                    console.log("서버 응답 데이터:", json);
+                    if (json.returnCode !== 0) {
+                        alert("공지사항 데이터를 불러오는 데 실패했습니다.");
+                        return [];
+                    }
+                    json.recordsTotal = json.data.total;
+                    json.recordsFiltered = json.data.total;
+                    return json.data.list;
+                },
+            },
+            serverSide: true, // 서버 사이드 처리 활성화
+            processing: true, // 로딩 표시 활성화
+            ordering: false,
+            searching: false,
+            columns: [
+                { data: "courseId" }, // ID
+                {
+                    data: "title", // 교육과정명
+                    render: function (data, type, row) {
+                        return (
+                            "<a href='#' onclick=\"initModifyCourseModal('" +
+                            row.courseId +
+                            "')\">" +
+                            row.title +
+                            "</a>"
+                        );
+                    },
+                },
+                {
+                    data: "isPublished",
+                    render: function (data, type, row) {
+                        return data ? "노출" : "비노출";
+                    },
+                },
+                { data: "maxCapacity" }, // 모집인원
+                { data: "currentEnrollment" }, // 신청인원
+                { data: "writtenApplicationCount" }, // 서명신청인원
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return (
+                            "<button class='btn btn-sm btn-danger' onclick=\"deleteCourse('" +
+                            row.courseId +
+                            "')\">삭제</button>"
+                        );
+                    },
+                },
+                {
+                    data: null, // 강의관리 버튼
+                    render: function (data, type, row) {
+                        return (
+                            "<button class='btn btn-sm btn-primary' onclick=\"initLectureList('" +
+                            row.courseId +
+                            "')\">관리</button>"
+                        );
+                    },
+                },
+            ],
+            language: {
+                info: "총 _TOTAL_개의 교육과정 중 _START_부터 _END_까지 표시", // 전체 갯수 표시
+                infoEmpty: "표시할 데이터가 없습니다.", // 데이터가 없을 때 표시
+                infoFiltered: "(총 _MAX_개의 데이터에서 필터링됨)", // 필터링된 데이터 정보
+                paginate: {
+                    first: "처음", // "처음" 버튼 텍스트
+                    last: "마지막", // "마지막" 버튼 텍스트
+                    next: "다음", // "다음" 버튼 텍스트
+                    previous: "이전", // "이전" 버튼 텍스트
+                },
+            },
+        });
+
+        return courseDataTable;
+
+      }
+
+      function initModifyCourseModal(courseId) {
+
+        axios.get(`${contextPath}/course-lecture/course?courseId=` + courseId)
+             .then(function (response) {
                 const courseData = response.data.data; // 서버에서 반환된 데이터
 
                 // 서버에서 가져온 데이터로 모달에 채우기
@@ -447,6 +403,29 @@
             .catch(function (error) {
                 console.error("강의 정보를 가져오는 데 실패했습니다:", error);
                 Swal.fire("오류", "강의 정보를 가져오는 데 실패했습니다.", "error");
+            });
+
+      }
+
+      function initLectureList(courseId) {
+        // 강의관리 모달 표시
+        $("#lectureManagementModal").modal("show");
+
+        // 서버에서 강의 데이터를 가져와 테이블에 채우기
+        axios
+            .get(`${contextPath}/course-lecture/lectures?courseId=` + courseId)
+            .then(function (response) {
+                const lectureData = response.data.data; // 서버에서 반환된 데이터
+
+                // 강의 테이블 초기화
+                const lectureTable = $("#lectureTable").DataTable();
+                lectureTable.clear(); // 기존 데이터 초기화
+                lectureTable.rows.add(lectureData.list); // 새로운 데이터 추가
+                lectureTable.draw(); // 테이블 갱신
+            })
+            .catch(function (error) {
+                console.error("강의 데이터를 가져오는 데 실패했습니다:", error);
+                Swal.fire("오류", "강의 데이터를 가져오는 데 실패했습니다.", "error");
             });
       }
     </script>

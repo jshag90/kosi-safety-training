@@ -120,4 +120,9 @@ public class CourseLectureService {
     public CourseDto getCourseById(Long courseId) {
         return courseLectureDao.getCourseByCourseId(courseId);
     }
+
+    @Transactional
+    public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) {
+        courseLectureDao.updateCourse(requestUpdateVO);
+    }
 }

@@ -115,6 +115,19 @@ public class CourseLectureRestController {
         return new ResponseEntity<>(courseDtoResultVO, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @PutMapping("/course")
+    public ResponseEntity<ResultVO<Void>> updateCourse(@ModelAttribute CourseVO.RequestUpdateVO requestUpdateVO){
+        log.info(requestUpdateVO.toString());
+        courseLectureService.updateCourse(requestUpdateVO);
+
+        ResultVO<Void> voidResultVO = ResultVO.<Void>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .build();
+
+        return new ResponseEntity<>(voidResultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
 
 
 

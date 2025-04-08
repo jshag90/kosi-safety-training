@@ -55,4 +55,6 @@ public class CourseDto {
 
     String registrationPopupMessage;
 
+    Boolean isPublished;
+
 }
