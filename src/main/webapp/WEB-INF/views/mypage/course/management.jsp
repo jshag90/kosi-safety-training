@@ -80,7 +80,7 @@
       aria-labelledby="editCourseModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="editCourseModalLabel">교육과정 수정</h5>
@@ -93,23 +93,72 @@
           </div>
           <div class="modal-body">
             <form id="editCourseForm">
+              <!-- 노출여부 라디오 버튼 추가 -->
               <div class="mb-3">
-                <label for="courseTitle" class="form-label">교육과정명</label>
+                <label class="form-label">노출여부</label>
+                <div>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="isPublished"
+                      id="isPublishedYes"
+                      value="true"
+                    />
+                    <label class="form-check-label" for="isPublishedYes"
+                      >노출</label
+                    >
+                  </div>
+
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="isPublished"
+                      id="isPublishedNo"
+                      value="false"
+                    />
+                    <label class="form-check-label" for="isPublishedNo"
+                      >비노출</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="category">과정카테고리(노출위치)</label>
+                <select
+                  class="form-control"
+                  id="category"
+                  name="category"
+                  required
+                >
+                  <option value="">카테고리를 선택하세요</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="courseTitle" class="form-label">교육명</label>
                 <input
                   type="text"
                   class="form-control"
                   id="courseTitle"
-                  name="courseName"
+                  name="courseTitle"
                 />
               </div>
+
               <div class="mb-3">
-                <label for="courseDescription" class="form-label">설명</label>
-                <textarea
+                <label for="courseThumbnail" class="form-label"
+                  >교육썸네일</label
+                >
+                <input
+                  type="file"
                   class="form-control"
-                  id="courseDescription"
-                  name="courseDescription"
-                ></textarea>
+                  id="courseThumbnail"
+                  name="courseThumbnail"
+                />
               </div>
+
               <div class="mb-3">
                 <label for="courseStartDate" class="form-label"
                   >교육 시작일</label
@@ -132,26 +181,143 @@
                   name="endDate"
                 />
               </div>
-              <div class="mb-3">
-                <label for="courseThumbnail" class="form-label">썸네일</label>
+
+              <div class="form-group row">
+                <div class="col-md-6">
+                  <label for="startTime">교육 시작시간</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="startTime"
+                    name="startTime"
+                    placeholder="교육 시작시간을 선택하세요."
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="endTime">교육 종료시간</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="endTime"
+                    name="endTime"
+                    placeholder="교육 종료시간을 선택하세요."
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <div class="col-md-6">
+                  <label for="applyStartDate">신청 시작일</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="applyStartDate"
+                    name="applyStartDate"
+                    placeholder="신청 시작일을 선택하세요."
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="applyEndDate">신청 종료일</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="applyEndDate"
+                    name="applyEndDate"
+                    placeholder="신청 종료일을 선택하세요."
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="recruitmentCount">모집인원</label>
                 <input
-                  type="file"
+                  type="number"
                   class="form-control"
-                  id="courseThumbnail"
-                  name="courseThumbnail"
+                  id="recruitmentCount"
+                  name="recruitmentCount"
+                  placeholder="모집인원을 입력하세요."
+                  required
                 />
               </div>
-              <div class="mb-3">
-                <label for="courseNotice" class="form-label">공지사항 파일</label>
+
+              <div class="form-group">
+                <label for="writtenApplicationCount">서면 신청 인원</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="writtenApplicationCount"
+                  name="writtenApplicationCount"
+                  placeholder="서면 신청 인원을 입력하세요."
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="courseLocation">교육장소</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="courseLocation"
+                  name="courseLocation"
+                  placeholder="교육장소를 입력하세요."
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="courseFee">교육비(원)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="courseFee"
+                  name="courseFee"
+                  placeholder="교육비를 입력하세요."
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="courseDescription">교육설명</label>
+                <textarea
+                  class="form-control"
+                  id="courseDescription"
+                  rows="3"
+                  name="courseDescription"
+                  placeholder="교육설명을 입력하세요."
+                  required
+                ></textarea>
+              </div>
+
+              <!-- 안내 공문 등록 -->
+              <div class="form-group">
+                <label for="courseNotice">안내 공문</label>
                 <input
                   type="file"
                   class="form-control"
                   id="courseNotice"
                   name="courseNotice"
+                  accept=".pdf,.doc,.docx,.xlsx,.hwp,.hwpx"
+                  required
                 />
               </div>
-              
-              <input type="hidden" id="courseId" name="courseId" value="${courseId}"/>
+
+              <div class="form-group">
+                <label for="popupNotice">수강신청 팝업 안내문</label>
+                <textarea
+                  class="form-control"
+                  id="popupNotice"
+                  name="popupNotice"
+                  rows="3"
+                  placeholder="수강신청 팝업 안내문을 입력하세요."
+                  required
+                ></textarea>
+              </div>
+
+              <input type="hidden" id="courseId" name="courseId" />
             </form>
           </div>
           <div class="modal-footer">
@@ -241,40 +407,23 @@
         }).then((result) => {
           if (result.isConfirmed) {
             axios
-                .delete(`${contextPath}/course-lecture/courses?courseId=` + courseId)
-                .then((response) => {
-                    Swal.fire("삭제 완료", "교육과정이 삭제되었습니다.", "success");
-                    $("#courseTable").DataTable().ajax.reload(); // 테이블 데이터 갱신
-                })
-                .catch((error) => {
-                    console.error("삭제 실패:", error);
-                    Swal.fire(
-                        "삭제 실패",
-                        "교육과정을 삭제할 수 없습니다.",
-                        "error"
-                    );
-                });
+              .delete(
+                `${contextPath}/course-lecture/courses?courseId=` + courseId
+              )
+              .then((response) => {
+                Swal.fire("삭제 완료", "교육과정이 삭제되었습니다.", "success");
+                $("#courseTable").DataTable().ajax.reload(); // 테이블 데이터 갱신
+              })
+              .catch((error) => {
+                console.error("삭제 실패:", error);
+                Swal.fire(
+                  "삭제 실패",
+                  "교육과정을 삭제할 수 없습니다.",
+                  "error"
+                );
+              });
           }
         });
-      }
-
-      function openEditCourseModal(courseId) {
-
-        axios.get(`${contextPath}/course-lecture/course?courseId=` + courseId)
-            .then(function (response) {
-                const courseData = response.data.data;
-             
-                $("#courseTitle").val(courseData.title);
-                $("#courseDescription").val(courseData.description);
-                $("#courseStartDate").val(courseData.courseStartDate);
-                $("#courseEndDate").val(courseData.courseEndDate);
-         
-                $("#editCourseModal").modal("show");
-            })
-            .catch(function (error) {
-                console.error("강의 정보를 가져오는 데 실패했습니다:", error);
-                Swal.fire("오류", "강의 정보를 가져오는 데 실패했습니다.", "error");
-            });
       }
 
       function updateCourseChanges() {
@@ -282,151 +431,160 @@
         const formData = new FormData(form);
 
         console.log("TEST :", JSON.stringify(formData));
-        
-        axios.put(`${contextPath}/course-lecture/course`, formData, {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
-                },
-              })
-              .then(function (response) {
-                  Swal.fire("수정 완료", "교육과정이 성공적으로 수정되었습니다.", "success");
-                  $("#editCourseModal").modal("hide");
-                  $("#courseTable").DataTable().ajax.reload();
-              })
-              .catch(function (error) {
-                  console.error("수정 실패:", error);
-                  Swal.fire("오류", "교육과정을 수정하는 데 실패했습니다.", "error");
-              });
+
+        axios
+          .put(`${contextPath}/course-lecture/course`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+            },
+          })
+          .then(function (response) {
+            Swal.fire(
+              "수정 완료",
+              "교육과정이 성공적으로 수정되었습니다.",
+              "success"
+            );
+            $("#editCourseModal").modal("hide");
+            $("#courseTable").DataTable().ajax.reload();
+          })
+          .catch(function (error) {
+            console.error("수정 실패:", error);
+            Swal.fire("오류", "교육과정을 수정하는 데 실패했습니다.", "error");
+          });
       }
 
       function initCourseTable() {
         const courseDataTable = $("#courseTable").DataTable({
-            ajax: {
-                url: `${contextPath}/course-lecture/courses`,
-                type: "GET",
-                data: function (d) {
-                    d.page = d.start / d.length + 1;
-                    d.pageSize = d.length;
-                },
-                dataSrc: function (json) {
-                    console.log("서버 응답 데이터:", json);
-                    if (json.returnCode !== 0) {
-                        alert("공지사항 데이터를 불러오는 데 실패했습니다.");
-                        return [];
-                    }
-                    json.recordsTotal = json.data.total;
-                    json.recordsFiltered = json.data.total;
-                    return json.data.list;
-                },
+          ajax: {
+            url: `${contextPath}/course-lecture/courses`,
+            type: "GET",
+            data: function (d) {
+              d.page = d.start / d.length + 1;
+              d.pageSize = d.length;
             },
-            serverSide: true, // 서버 사이드 처리 활성화
-            processing: true, // 로딩 표시 활성화
-            ordering: false,
-            searching: false,
-            columns: [
-                { data: "courseId" }, // ID
-                {
-                    data: "title", // 교육과정명
-                    render: function (data, type, row) {
-                        return (
-                            "<a href='#' onclick=\"initModifyCourseModal('" +
-                            row.courseId +
-                            "')\">" +
-                            row.title +
-                            "</a>"
-                        );
-                    },
-                },
-                {
-                    data: "isPublished",
-                    render: function (data, type, row) {
-                        return data ? "노출" : "비노출";
-                    },
-                },
-                { data: "maxCapacity" }, // 모집인원
-                { data: "currentEnrollment" }, // 신청인원
-                { data: "writtenApplicationCount" }, // 서명신청인원
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        return (
-                            "<button class='btn btn-sm btn-danger' onclick=\"deleteCourse('" +
-                            row.courseId +
-                            "')\">삭제</button>"
-                        );
-                    },
-                },
-                {
-                    data: null, // 강의관리 버튼
-                    render: function (data, type, row) {
-                        return (
-                            "<button class='btn btn-sm btn-primary' onclick=\"initLectureList('" +
-                            row.courseId +
-                            "')\">관리</button>"
-                        );
-                    },
-                },
-            ],
-            language: {
-                info: "총 _TOTAL_개의 교육과정 중 _START_부터 _END_까지 표시", // 전체 갯수 표시
-                infoEmpty: "표시할 데이터가 없습니다.", // 데이터가 없을 때 표시
-                infoFiltered: "(총 _MAX_개의 데이터에서 필터링됨)", // 필터링된 데이터 정보
-                paginate: {
-                    first: "처음", // "처음" 버튼 텍스트
-                    last: "마지막", // "마지막" 버튼 텍스트
-                    next: "다음", // "다음" 버튼 텍스트
-                    previous: "이전", // "이전" 버튼 텍스트
-                },
+            dataSrc: function (json) {
+              console.log("서버 응답 데이터:", json);
+              if (json.returnCode !== 0) {
+                alert("공지사항 데이터를 불러오는 데 실패했습니다.");
+                return [];
+              }
+              json.recordsTotal = json.data.total;
+              json.recordsFiltered = json.data.total;
+              return json.data.list;
             },
+          },
+          serverSide: true, // 서버 사이드 처리 활성화
+          processing: true, // 로딩 표시 활성화
+          ordering: false,
+          searching: false,
+          columns: [
+            { data: "courseId" }, // ID
+            {
+              data: "title", // 교육과정명
+              render: function (data, type, row) {
+                return (
+                  "<a href='#' onclick=\"initModifyCourseModal('" +
+                  row.courseId +
+                  "')\">" +
+                  row.title +
+                  "</a>"
+                );
+              },
+            },
+            {
+              data: "isPublished",
+              render: function (data, type, row) {
+                return data ? "노출" : "비노출";
+              },
+            },
+            { data: "maxCapacity" }, // 모집인원
+            { data: "currentEnrollment" }, // 신청인원
+            { data: "writtenApplicationCount" }, // 서명신청인원
+            {
+              data: null,
+              render: function (data, type, row) {
+                return (
+                  "<button class='btn btn-sm btn-danger' onclick=\"deleteCourse('" +
+                  row.courseId +
+                  "')\">삭제</button>"
+                );
+              },
+            },
+            {
+              data: null, // 강의관리 버튼
+              render: function (data, type, row) {
+                return (
+                  "<button class='btn btn-sm btn-primary' onclick=\"initLectureList('" +
+                  row.courseId +
+                  "')\">관리</button>"
+                );
+              },
+            },
+          ],
+          language: {
+            info: "총 _TOTAL_개의 교육과정 중 _START_부터 _END_까지 표시", // 전체 갯수 표시
+            infoEmpty: "표시할 데이터가 없습니다.", // 데이터가 없을 때 표시
+            infoFiltered: "(총 _MAX_개의 데이터에서 필터링됨)", // 필터링된 데이터 정보
+            paginate: {
+              first: "처음", // "처음" 버튼 텍스트
+              last: "마지막", // "마지막" 버튼 텍스트
+              next: "다음", // "다음" 버튼 텍스트
+              previous: "이전", // "이전" 버튼 텍스트
+            },
+          },
         });
 
         return courseDataTable;
-
       }
 
       function initModifyCourseModal(courseId) {
+        axios
+          .get(`${contextPath}/course-lecture/course?courseId=` + courseId)
+          .then(function (response) {
+            const courseData = response.data.data;
+            setModifyCourseModalFormData(courseData);
+            $("#editCourseModal").modal("show");
+          })
+          .catch(function (error) {
+            console.error("강의 정보를 가져오는 데 실패했습니다:", error);
+            Swal.fire("오류", "강의 정보를 가져오는 데 실패했습니다.", "error");
+          });
+      }
 
-        axios.get(`${contextPath}/course-lecture/course?courseId=` + courseId)
-             .then(function (response) {
-                const courseData = response.data.data; // 서버에서 반환된 데이터
+      function setModifyCourseModalFormData(courseData) {
+        $("#courseTitle").val(courseData.title);
+        $("#courseDescription").val(courseData.description);
+        $("#courseStartDate").val(courseData.courseStartDate);
+        $("#courseEndDate").val(courseData.courseEndDate);
+        $("#startTime").val(courseData.formattedCourseStartTime);
+        $("#endTime").val(courseData.formattedCourseEndTime);
+        $("#courseId").val(courseData.courseId);
 
-                // 서버에서 가져온 데이터로 모달에 채우기
-                $("#courseTitle").val(courseData.title);
-                $("#courseDescription").val(courseData.description);
-                $("#courseStartDate").val(courseData.courseStartDate);
-                $("#courseEndDate").val(courseData.courseEndDate);
-
-                // 모달 표시
-                $("#editCourseModal").modal("show");
-            })
-            .catch(function (error) {
-                console.error("강의 정보를 가져오는 데 실패했습니다:", error);
-                Swal.fire("오류", "강의 정보를 가져오는 데 실패했습니다.", "error");
-            });
-
+        courseData.isPublished === true
+          ? $("#isPublishedYes").prop("checked", true)
+          : $("#isPublishedNo").prop("checked", true);
       }
 
       function initLectureList(courseId) {
-        // 강의관리 모달 표시
         $("#lectureManagementModal").modal("show");
-
-        // 서버에서 강의 데이터를 가져와 테이블에 채우기
         axios
-            .get(`${contextPath}/course-lecture/lectures?courseId=` + courseId)
-            .then(function (response) {
-                const lectureData = response.data.data; // 서버에서 반환된 데이터
-
-                // 강의 테이블 초기화
-                const lectureTable = $("#lectureTable").DataTable();
-                lectureTable.clear(); // 기존 데이터 초기화
-                lectureTable.rows.add(lectureData.list); // 새로운 데이터 추가
-                lectureTable.draw(); // 테이블 갱신
-            })
-            .catch(function (error) {
-                console.error("강의 데이터를 가져오는 데 실패했습니다:", error);
-                Swal.fire("오류", "강의 데이터를 가져오는 데 실패했습니다.", "error");
-            });
+          .get(`${contextPath}/course-lecture/lectures?courseId=` + courseId)
+          .then(function (response) {
+            const lectureData = response.data.data;
+            const lectureTable = $("#lectureTable").DataTable();
+            lectureTable.clear();
+            lectureTable.rows.add(lectureData.list);
+            lectureTable.draw();
+          })
+          .catch(function (error) {
+            console.error("강의 데이터를 가져오는 데 실패했습니다:", error);
+            Swal.fire(
+              "오류",
+              "강의 데이터를 가져오는 데 실패했습니다.",
+              "error"
+            );
+          });
       }
     </script>
   </body>

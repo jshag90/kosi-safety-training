@@ -8,17 +8,21 @@ import com.kosi.util.*;
 import com.kosi.vo.CourseVO;
 import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseLectureService {
 
     private final static String courseQuestion = "(033) 645-6330";
@@ -118,7 +122,11 @@ public class CourseLectureService {
     }
 
     public CourseDto getCourseById(Long courseId) {
-        return courseLectureDao.getCourseByCourseId(courseId);
+        CourseDto findCourseDto = courseLectureDao.getCourseByCourseId(courseId);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        findCourseDto.setFormattedCourseStartTime(String.valueOf(LocalTime.parse(findCourseDto.getCourseStartTime().format(dateTimeFormatter))));
+        findCourseDto.setFormattedCourseEndTime(String.valueOf(LocalTime.parse(findCourseDto.getCourseEndTime().format(dateTimeFormatter))));
+        return findCourseDto;
     }
 
     @Transactional

@@ -158,7 +158,8 @@ public class CourseLectureDao {
 
     public CourseDto getCourseByCourseId(Long courseId) {
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
-                        course.courseId
+                          course.courseId
+                        , course.isPublished
                         , course.title
                         , course.description
                         , course.courseStartDate

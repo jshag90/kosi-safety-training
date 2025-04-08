@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class CourseDto {
 
     Long courseId;
@@ -26,11 +27,13 @@ public class CourseDto {
 
     String courseTimeSum;
 
-    @JsonIgnore
     LocalTime courseStartTime;
 
-    @JsonIgnore
+    String formattedCourseStartTime;
+
     LocalTime courseEndTime;
+
+    String formattedCourseEndTime;
 
     String courseQuestion;
 
