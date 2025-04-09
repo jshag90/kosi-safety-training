@@ -52,6 +52,22 @@ public class CourseLectureDao {
                 .limit(1);
     }
 
+    private static JPQLQuery<String> getCourseThumbnailFileNameSubQuery() {
+        return JPAExpressions.select(uploadFiles.fileName)
+                .from(uploadFiles)
+                .where(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL),
+                        uploadFiles.postId.eq(course.courseId))
+                .limit(1);
+    }
+
+    private static JPQLQuery<String> getCourseNoticeFileNameSubQuery() {
+        return JPAExpressions.select(uploadFiles.fileName)
+                .from(uploadFiles)
+                .where(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_NOTICE_FILE),
+                        uploadFiles.postId.eq(course.courseId))
+                .limit(1);
+    }
+
     private static JPQLQuery<Integer> getEnrollmentCountSubQuery(){
         return JPAExpressions
                 .select(Expressions.numberTemplate(Integer.class, "count(*)"))
@@ -177,6 +193,8 @@ public class CourseLectureDao {
                         , courseCategory.courseCategoryType
                         , ExpressionUtils.as(getCourseThumbnailSubQuery(), "courseThumbnailBase64")
                         , ExpressionUtils.as(getEnrollmentCountSubQuery(), "currentEnrollment")
+                        , ExpressionUtils.as(getCourseThumbnailFileNameSubQuery(), "courseThumbnailFileName")
+                        , ExpressionUtils.as(getCourseNoticeFileNameSubQuery(), "courseNoticeFileName")
                 )).from(course)
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
                 .where(course.courseId.eq(courseId)).fetchOne();
@@ -211,12 +229,8 @@ public class CourseLectureDao {
     }
 
     public void deleteCourseById(Long courseId) {
-        // 1. 삭제될 lecture ID 목록 조회
-        List<Long> deletedLectureIds = jpaQueryFactory
-                .select(lecture.lectureId)
-                .from(lecture)
-                .where(lecture.course.courseId.eq(courseId))
-                .fetch();
+
+        List<Long> deletedLectureIds = getDeletedLectureIds(courseId);
 
         jpaQueryFactory.delete(video).where(video.lecture.lectureId.in(deletedLectureIds)).execute();
         jpaQueryFactory.delete(lecture).where(lecture.course.courseId.eq(courseId)).execute();
@@ -229,11 +243,17 @@ public class CourseLectureDao {
 
     }
 
+    private List<Long> getDeletedLectureIds(Long courseId) {
+        return jpaQueryFactory.select(lecture.lectureId).from(lecture).where(lecture.course.courseId.eq(courseId)).fetch();
+    }
+
     public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) {
+        String courseFee = requestUpdateVO.getCourseFee().replace(",","");
         jpaQueryFactory.update(course).set(course.title, requestUpdateVO.getCourseName())
                 .set(course.description, requestUpdateVO.getCourseDescription())
                 .set(course.courseStartDate, LocalDate.parse(requestUpdateVO.getStartDate()))
                 .set(course.courseEndDate, LocalDate.parse(requestUpdateVO.getEndDate()))
+                .set(course.price, Integer.parseInt(courseFee))
                 .where(course.courseId.eq(requestUpdateVO.getCourseId()))
                 .execute();
 

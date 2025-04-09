@@ -56,6 +56,10 @@ public class CourseDto {
 
     String courseThumbnailBase64;
 
+    String courseThumbnailFileName;
+
+    String courseNoticeFileName;
+
     String registrationPopupMessage;
 
     Boolean isPublished;

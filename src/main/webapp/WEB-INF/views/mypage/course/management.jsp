@@ -138,12 +138,12 @@
               </div>
 
               <div class="mb-3">
-                <label for="courseTitle" class="form-label">교육명</label>
+                <label for="courseName" class="form-label">교육명</label>
                 <input
                   type="text"
                   class="form-control"
-                  id="courseTitle"
-                  name="courseTitle"
+                  id="courseName"
+                  name="courseName"
                 />
               </div>
 
@@ -397,6 +397,49 @@
         initCourseTable();
       });
 
+      function initCourseCategorySelector(selectedCategoryId) {
+        const categorySelect = $("#category");
+        const apiEndpoint = `${contextPath}/course-lecture/course-category`;
+        const accessToken = sessionStorage.getItem("accessToken");
+
+        if (!accessToken) {
+          alert("로그인이 필요합니다. 다시 로그인해주세요.");
+          return;
+        }
+
+        axios
+          .get(apiEndpoint, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+            },
+          })
+          .then((response) => {
+            const categories = response.data.data; // Assuming the API returns an array of categories
+            categorySelect.empty(); // 기존 옵션 초기화
+            categorySelect.append(
+              '<option value="">카테고리를 선택하세요</option>'
+            ); // 기본 옵션 추가
+
+            categories.forEach((category) => {
+              const courseName =
+                category.courseCategoryType + " - " + category.courseName;
+              const option =
+                "<option value='" +
+                category.id +
+                "'" +
+                (selectedCategoryId === category.id ? " selected" : "") +
+                ">" +
+                courseName +
+                "</option>";
+              categorySelect.append(option);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching categories:", error);
+            alert("카테고리 목록을 불러오는 중 오류가 발생했습니다.");
+          });
+      }
+
       function deleteCourse(courseId) {
         Swal.fire({
           title: "교육과정을 삭제하시겠습니까?",
@@ -553,17 +596,30 @@
       }
 
       function setModifyCourseModalFormData(courseData) {
-        $("#courseTitle").val(courseData.title);
+        $("#courseName").val(courseData.title);
         $("#courseDescription").val(courseData.description);
         $("#courseStartDate").val(courseData.courseStartDate);
         $("#courseEndDate").val(courseData.courseEndDate);
         $("#startTime").val(courseData.formattedCourseStartTime);
         $("#endTime").val(courseData.formattedCourseEndTime);
+        $("#applyStartDate").val(courseData.applyStartDate);
+        $("#applyEndDate").val(courseData.applyEndDate);
+        $("#recruitmentCount").val(courseData.maxCapacity);
+        $("#writtenApplicationCount").val(courseData.writtenApplicationCount);
+        $("#courseLocation").val(courseData.location);
+        $("#courseFee").val(Number(courseData.price).toLocaleString("ko-KR"));
+        $("#popupNotice").val(courseData.registrationPopupMessage);
         $("#courseId").val(courseData.courseId);
 
+        const courseCategoryId = courseData.courseCategoryId;
+
+        // 노출 여부 라디오 버튼 설정
         courseData.isPublished === true
           ? $("#isPublishedYes").prop("checked", true)
           : $("#isPublishedNo").prop("checked", true);
+
+        // 카테고리 초기화 및 선택
+        initCourseCategorySelector(courseCategoryId);
       }
 
       function initLectureList(courseId) {
