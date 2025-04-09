@@ -104,7 +104,7 @@ public class CourseLectureDao {
         if (!requestSaveVO.getCourseThumbnail().isEmpty()) {
             UploadFiles uploadFiles = UploadFiles.builder()
                     .fileData(requestSaveVO.getCourseThumbnail().getBytes())
-                    .fileName(requestSaveVO.getCourseThumbnail().getName())
+                    .fileName(requestSaveVO.getCourseThumbnail().getOriginalFilename())
                     .postId(saveCourse.getCourseId())
                     .uploadFileType(UploadFileType.COURSE_THUMBNAIL)
                     .build();
@@ -115,7 +115,7 @@ public class CourseLectureDao {
         if (!requestSaveVO.getCourseNotice().isEmpty()) {
             UploadFiles uploadFiles = UploadFiles.builder()
                     .fileData(requestSaveVO.getCourseNotice().getBytes())
-                    .fileName(requestSaveVO.getCourseNotice().getName())
+                    .fileName(requestSaveVO.getCourseNotice().getOriginalFilename())
                     .postId(saveCourse.getCourseId())
                     .uploadFileType(UploadFileType.COURSE_NOTICE_FILE)
                     .build();
@@ -223,8 +223,9 @@ public class CourseLectureDao {
 
         jpaQueryFactory.delete(enrollment).where(enrollment.course.courseId.eq(courseId)).execute();
         jpaQueryFactory.delete(course).where(course.courseId.eq(courseId)).execute();
-        jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_NOTICE_FILE)));
-        jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL)));
+
+        jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_NOTICE_FILE))).execute();
+        jpaQueryFactory.delete(uploadFiles).where(uploadFiles.postId.eq(courseId).and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL))).execute();
 
     }
 
