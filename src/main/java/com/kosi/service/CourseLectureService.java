@@ -3,6 +3,7 @@ package com.kosi.service;
 import com.kosi.dao.CourseLectureDao;
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
+import com.kosi.dto.LectureDto;
 import com.kosi.dto.ListResp;
 import com.kosi.util.*;
 import com.kosi.vo.CourseVO;
@@ -132,5 +133,16 @@ public class CourseLectureService {
     @Transactional
     public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) throws IOException {
         courseLectureDao.updateCourse(requestUpdateVO);
+    }
+
+    public ListResp<LectureDto> getLectures(Long courseId, Integer pageSize, Integer page) {
+        QueryResults<LectureDto> lectureDtoQueryResults = courseLectureDao.getLectures(courseId, pageSize, page);
+        long totalCount = lectureDtoQueryResults.getTotal();
+        return ListResp.<LectureDto>builder()
+                .list(lectureDtoQueryResults.getResults())
+                .total((int) totalCount)
+                .currPg(page)
+                .lastPg(PagingUtil.getLastPage((int) totalCount, pageSize))
+                .build();
     }
 }

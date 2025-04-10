@@ -2,6 +2,7 @@ package com.kosi.dao;
 
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
+import com.kosi.dto.LectureDto;
 import com.kosi.entity.Course;
 import com.kosi.entity.UploadFiles;
 import com.kosi.util.*;
@@ -297,4 +298,15 @@ public class CourseLectureDao {
         }
 
     }
+
+    public QueryResults<LectureDto> getLectures(Long courseId, Integer pageSize, Integer page) {
+        return jpaQueryFactory.select(Projections.bean(LectureDto.class, lecture.lectureId
+                , lecture.title
+                , lecture.lectureOrder
+                )).from(lecture)
+                .where(lecture.course.courseId.eq(courseId))
+                .orderBy(lecture.lectureOrder.asc())
+                .fetchResults();
+    }
+
 }

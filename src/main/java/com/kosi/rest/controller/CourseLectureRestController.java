@@ -2,6 +2,7 @@ package com.kosi.rest.controller;
 
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
+import com.kosi.dto.LectureDto;
 import com.kosi.dto.ListResp;
 import com.kosi.service.CourseLectureService;
 import com.kosi.util.CourseCategory;
@@ -128,6 +129,22 @@ public class CourseLectureRestController {
         return new ResponseEntity<>(voidResultVO, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @GetMapping("/lectures")
+    public ResponseEntity<ResultVO<ListResp<LectureDto>>> getLectures(
+            @RequestParam("courseId") Long courseId,
+            @RequestParam("pageSize") Integer pageSize,
+            @RequestParam("page") Integer page
+    ) {
+
+        ListResp<LectureDto> lectureDtoList = courseLectureService.getLectures(courseId, pageSize, page);
+        ResultVO<ListResp<LectureDto>> resultVO = ResultVO.<ListResp<LectureDto>>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(lectureDtoList)
+                .build();
+
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
 
 
 

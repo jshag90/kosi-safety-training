@@ -25,9 +25,11 @@ public class Lecture {
     @Column(nullable = false, length = 255)
     private String title;
 
+    private Integer lectureOrder;
+
     @OneToOne
-    @JoinColumn(name = "video_id", referencedColumnName = "idx", nullable = false)
-    private Video video; // OneToOne 관계로 Video 엔티티와 연결
+    @JoinColumn(name = "video_id", referencedColumnName = "idx", nullable = true)
+    private Video video;
 
     @Column
     private Integer duration; // 강의 길이(분)

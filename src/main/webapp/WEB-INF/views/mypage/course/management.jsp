@@ -27,6 +27,11 @@
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/rowreorder/1.3.3/css/rowReorder.dataTables.min.css"
+    />
+    <script src="https://cdn.datatables.net/rowreorder/1.3.3/js/dataTables.rowReorder.min.js"></script>
     <style>
       .row {
         --bs-gutter-x: 0.5rem; /* Adjust the horizontal spacing between columns */
@@ -390,14 +395,16 @@
             ></button>
           </div>
           <div class="modal-body">
-            <table id="lectureTable" class="table table-bordered">
+            <button id="toggleReorder" class="btn btn-primary mb-3">
+              순서 변경
+            </button>
+            <!-- 순서 변경 버튼 추가 -->
+            <table id="lectureTable" class="display" style="width: 100%">
               <thead>
                 <tr>
-                  <th>강의 ID</th>
-                  <th>노출여부</th>
+                  <th>ID</th>
                   <th>강의명</th>
-                  <th>강의 시작일</th>
-                  <th>강의 종료일</th>
+                  <th>강의순서</th>
                 </tr>
               </thead>
               <tbody>
@@ -592,7 +599,9 @@
                 return (
                   "<button class='btn btn-sm btn-danger' onclick=\"deleteCourse('" +
                   row.courseId +
-                  "')\">삭제</button>"
+                  "')\">" +
+                  "<i class='fas fa-trash'></i>" + // FontAwesome trash 아이콘 추가
+                  "</button>"
                 );
               },
             },
@@ -602,7 +611,9 @@
                 return (
                   "<button class='btn btn-sm btn-primary' onclick=\"initLectureList('" +
                   row.courseId +
-                  "')\">관리</button>"
+                  "')\">" +
+                  "<i class='fas fa-gear'></i>" + // FontAwesome trash 아이콘 추가
+                  "</button>"
                 );
               },
             },
@@ -687,23 +698,98 @@
 
       function initLectureList(courseId) {
         $("#lectureManagementModal").modal("show");
-        axios
-          .get(`${contextPath}/course-lecture/lectures?courseId=` + courseId)
-          .then(function (response) {
-            const lectureData = response.data.data;
-            const lectureTable = $("#lectureTable").DataTable();
-            lectureTable.clear();
-            lectureTable.rows.add(lectureData.list);
-            lectureTable.draw();
-          })
-          .catch(function (error) {
-            console.error("강의 데이터를 가져오는 데 실패했습니다:", error);
-            Swal.fire(
-              "오류",
-              "강의 데이터를 가져오는 데 실패했습니다.",
-              "error"
-            );
+
+        if (!$.fn.DataTable.isDataTable("#lectureTable")) {
+          const lectureTable = $("#lectureTable").DataTable({
+            ajax: {
+              url: `${contextPath}/course-lecture/lectures`,
+              type: "GET",
+              data: function (d) {
+                d.courseId = courseId; // courseId를 요청에 추가
+                d.page = d.start / d.length + 1; // 현재 페이지 번호 계산
+                d.pageSize = d.length; // 한 페이지에 표시할 데이터 수
+              },
+              dataSrc: function (json) {
+                if (json.returnCode !== 0) {
+                  Swal.fire(
+                    "오류",
+                    "강의 데이터를 불러오는 데 실패했습니다.",
+                    "error"
+                  );
+                  return [];
+                }
+                json.recordsTotal = json.data.total; // 전체 데이터 수
+                json.recordsFiltered = json.data.total; // 필터링된 데이터 수
+                return json.data.list; // 실제 데이터 반환
+              },
+            },
+            serverSide: true, // 서버 사이드 처리 활성화
+            processing: true, // 로딩 표시 활성화
+            ordering: false,
+            searching: false,
+            rowReorder: false, // 기본적으로 Row Reorder 비활성화
+            columns: [
+              { data: "lectureId", title: "강의 ID" },
+              { data: "title", title: "강의명" },
+              { data: "lectureOrder", title: "강의순서" },
+            ],
+            language: {
+              info: "총 _TOTAL_개의 강의 중 _START_부터 _END_까지 표시",
+              infoEmpty: "표시할 데이터가 없습니다.",
+              infoFiltered: "(총 _MAX_개의 데이터에서 필터링됨)",
+              paginate: {
+                first: "처음",
+                last: "마지막",
+                next: "다음",
+                previous: "이전",
+              },
+            },
           });
+
+          // 순서 변경 버튼 클릭 이벤트 처리
+          let reorderEnabled = false;
+          $("#toggleReorder").on("click", function () {
+            reorderEnabled = !reorderEnabled;
+
+            if (reorderEnabled) {
+              lectureTable.rowReorder.enable(); // Row Reorder 활성화
+              $(this).text("순서 변경 완료");
+            } else {
+              lectureTable.rowReorder.disable(); // Row Reorder 비활성화
+              $(this).text("순서 변경");
+            }
+          });
+
+          // 순서 변경 이벤트 처리
+          $("#lectureTable").on("row-reorder", function (e, details) {
+            const reorderedData = details.map((item) => ({
+              lectureId: item.node.querySelector("td:first-child").innerText,
+              newPosition: item.newPosition,
+            }));
+
+            console.log("순서 변경된 데이터:", reorderedData);
+
+            // 서버로 순서 변경 요청
+            axios
+              .post(`${contextPath}/course-lecture/update-order`, reorderedData)
+              .then((response) => {
+                Swal.fire("성공", "강의 순서가 변경되었습니다.", "success");
+              })
+              .catch((error) => {
+                console.error("순서 변경 실패:", error);
+                Swal.fire(
+                  "오류",
+                  "강의 순서를 변경하는 데 실패했습니다.",
+                  "error"
+                );
+              });
+          });
+        } else {
+          const lectureTable = $("#lectureTable").DataTable();
+          lectureTable.ajax
+            .url(`${contextPath}/course-lecture/lectures?courseId=${courseId}`)
+            .load();
+        }
       }
     </script>
   </body>
