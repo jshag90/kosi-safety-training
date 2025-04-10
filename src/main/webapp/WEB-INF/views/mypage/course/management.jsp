@@ -34,6 +34,14 @@
       .form-group {
         margin-bottom: 0.7rem; /* 아래쪽 여백 추가 */
       }
+      #courseTable th,
+      #courseTable td {
+        text-align: center; /* 텍스트를 가운데 정렬 */
+        vertical-align: middle; /* 수직 정렬 */
+      }
+      #courseTable .text-left {
+        text-align: left; /* 왼쪽 정렬 */
+      }
     </style>
   </head>
   <body>
@@ -57,6 +65,7 @@
                   <th>ID</th>
                   <th>교육과정명</th>
                   <th>노출여부</th>
+                  <th>교육기간</th>
                   <th>모집인원</th>
                   <th>신청인원</th>
                   <th>서명신청인원</th>
@@ -150,12 +159,28 @@
               <div class="mb-3">
                 <label for="courseThumbnail" class="form-label"
                   >교육썸네일</label
-                >
+                ><br />
+                <div style="text-align: center">
+                  <img
+                    id="savedCourseThumbnailImg"
+                    src="#"
+                    style="
+                      display: none;
+                      width: 300px;
+                      height: 300px;
+                      object-fit: cover;
+                    "
+                  /><br />
+                  <i class="fas fa-file-alt"></i>
+                  <label id="courseThumbnailFileName"></label>
+                </div>
+
                 <input
                   type="file"
                   class="form-control"
                   id="courseThumbnail"
                   name="courseThumbnail"
+                  accept="image/*"
                 />
               </div>
 
@@ -294,14 +319,16 @@
 
               <!-- 안내 공문 등록 -->
               <div class="form-group">
-                <label for="courseNotice">안내 공문</label>
+                <label for="courseNotice">안내 공문</label><br />
+                <i class="fas fa-file-alt"></i>
+                <label id="courseNoticeFileName"></label>
                 <input
                   type="file"
                   class="form-control"
                   id="courseNotice"
                   name="courseNotice"
                   accept=".pdf,.doc,.docx,.xlsx,.hwp,.hwpx"
-                  required
+                  autocomplete="off"
                 />
               </div>
 
@@ -392,9 +419,11 @@
     </div>
 
     <%@include file ="../../common/footer.jsp" %>
+    <script src="${contextPath}/js/course.js"></script>
     <script>
       $(document).ready(function () {
         initCourseTable();
+        initCourseFeeFormatting("#courseFee");
       });
 
       function initCourseCategorySelector(selectedCategoryId) {
@@ -525,6 +554,7 @@
             { data: "courseId" }, // ID
             {
               data: "title", // 교육과정명
+              className: "text-left", // 왼쪽 정렬 클래스 추가
               render: function (data, type, row) {
                 return (
                   "<a href='#' onclick=\"initModifyCourseModal('" +
@@ -539,6 +569,18 @@
               data: "isPublished",
               render: function (data, type, row) {
                 return data ? "노출" : "비노출";
+              },
+            },
+            {
+              data: "formattedCourseDate", // 교육기간
+              render: function (data, type, row) {
+                // 줄바꿈 처리
+                return data.replace(
+                  " ~ ",
+                  `<div class="d-flex flex-column justify-content-center align-items-center">
+                    <label class="text-center">~</label>
+                  </div>`
+                );
               },
             },
             { data: "maxCapacity" }, // 모집인원
@@ -620,6 +662,27 @@
 
         // 카테고리 초기화 및 선택
         initCourseCategorySelector(courseCategoryId);
+
+        // 썸네일 이미지 설정
+        if (courseData.courseThumbnailBase64) {
+          $("#savedCourseThumbnailImg")
+            .attr(
+              "src",
+              "data:image/png;base64," + courseData.courseThumbnailBase64
+            )
+            .show();
+          $("#courseThumbnailFileName").text(
+            courseData.courseThumbnailFileName
+          ); // 파일 이름 표시
+        } else {
+          $("#savedCourseThumbnailImg").hide(); // 썸네일이 없으면 숨김
+        }
+
+        if (courseData.courseNoticeFileName) {
+          $("#courseNoticeFileName").text(courseData.courseNoticeFileName); // 파일 이름 표시
+        } else {
+          $("#courseNoticeFileName").text(""); // 파일 이름 초기화
+        }
       }
 
       function initLectureList(courseId) {

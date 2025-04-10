@@ -7,6 +7,7 @@ import com.kosi.entity.UploadFiles;
 import com.kosi.util.*;
 import com.kosi.vo.CourseVO;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -37,12 +38,10 @@ import static com.kosi.entity.QVideo.video;
 @RequiredArgsConstructor
 public class CourseLectureDao {
 
+    private static final StringTemplate toBase64StringTemplate = Expressions.stringTemplate("function('TO_BASE64', {0})", uploadFiles.fileData);
     private final JPAQueryFactory jpaQueryFactory;
-
     @PersistenceContext
     private EntityManager entityManager;
-
-    private static final StringTemplate toBase64StringTemplate = Expressions.stringTemplate("function('TO_BASE64', {0})", uploadFiles.fileData);
 
     private static JPQLQuery<String> getCourseThumbnailSubQuery() {
         return JPAExpressions.select(toBase64StringTemplate)
@@ -68,7 +67,7 @@ public class CourseLectureDao {
                 .limit(1);
     }
 
-    private static JPQLQuery<Integer> getEnrollmentCountSubQuery(){
+    private static JPQLQuery<Integer> getEnrollmentCountSubQuery() {
         return JPAExpressions
                 .select(Expressions.numberTemplate(Integer.class, "count(*)"))
                 .from(enrollment)
@@ -174,7 +173,7 @@ public class CourseLectureDao {
 
     public CourseDto getCourseByCourseId(Long courseId) {
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
-                          course.courseId
+                        course.courseId
                         , course.isPublished
                         , course.title
                         , course.description
@@ -201,6 +200,16 @@ public class CourseLectureDao {
     }
 
     public QueryResults<CourseDto> getCourses(Integer pageSize, Integer page) {
+        Expression<String> formattedCourseDate = ExpressionUtils.as(
+                Expressions.stringTemplate(
+                        "CONCAT({0}, ' ~ ', {1})",
+                        course.courseStartDate,
+                        course.courseEndDate
+                ),
+                "formattedCourseDate"
+        );
+
+
         return jpaQueryFactory.select(Projections.bean(CourseDto.class,
                         course.courseId
                         , course.title
@@ -219,6 +228,7 @@ public class CourseLectureDao {
                         , courseCategory.courseCategoryType
                         , ExpressionUtils.as(getCourseThumbnailSubQuery(), "courseThumbnailBase64")
                         , ExpressionUtils.as(getEnrollmentCountSubQuery(), "currentEnrollment")
+                        , formattedCourseDate
                 )).from(course)
                 .innerJoin(courseCategory).on(course.courseCategory.courseCategoryId.eq(courseCategory.courseCategoryId))
                 .where()
@@ -247,15 +257,44 @@ public class CourseLectureDao {
         return jpaQueryFactory.select(lecture.lectureId).from(lecture).where(lecture.course.courseId.eq(courseId)).fetch();
     }
 
-    public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) {
-        String courseFee = requestUpdateVO.getCourseFee().replace(",","");
-        jpaQueryFactory.update(course).set(course.title, requestUpdateVO.getCourseName())
+    public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) throws IOException {
+        String courseFee = requestUpdateVO.getCourseFee().replace(",", "");
+        jpaQueryFactory.update(course)
+                .set(course.isPublished, requestUpdateVO.getIsPublished().equals("true"))
+                .set(course.title, requestUpdateVO.getCourseName())
                 .set(course.description, requestUpdateVO.getCourseDescription())
                 .set(course.courseStartDate, LocalDate.parse(requestUpdateVO.getStartDate()))
                 .set(course.courseEndDate, LocalDate.parse(requestUpdateVO.getEndDate()))
+                .set(course.courseStartTime, LocalTime.parse(requestUpdateVO.getStartTime()))
+                .set(course.courseEndTime, LocalTime.parse(requestUpdateVO.getEndTime()))
+                .set(course.applyStartDate, LocalDate.parse(requestUpdateVO.getApplyStartDate()))
+                .set(course.applyEndDate, LocalDate.parse(requestUpdateVO.getApplyEndDate()))
+                .set(course.maxCapacity, requestUpdateVO.getRecruitmentCount())
+                .set(course.writtenApplicationCount, requestUpdateVO.getWrittenApplicationCount())
+                .set(course.location, requestUpdateVO.getCourseLocation())
                 .set(course.price, Integer.parseInt(courseFee))
+                .set(course.description, requestUpdateVO.getCourseDescription())
+                .set(course.registrationPopupMessage, requestUpdateVO.getPopupNotice())
                 .where(course.courseId.eq(requestUpdateVO.getCourseId()))
                 .execute();
+
+        if (!requestUpdateVO.getCourseThumbnail().isEmpty()) {
+            jpaQueryFactory.update(uploadFiles)
+                    .set(uploadFiles.fileData, requestUpdateVO.getCourseThumbnail().getBytes())
+                    .set(uploadFiles.fileName, requestUpdateVO.getCourseThumbnail().getOriginalFilename())
+                    .where(uploadFiles.postId.eq(requestUpdateVO.getCourseId())
+                            .and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_THUMBNAIL)))
+                    .execute();
+        }
+
+        if(!requestUpdateVO.getCourseNotice().isEmpty()){
+            jpaQueryFactory.update(uploadFiles)
+                    .set(uploadFiles.fileData, requestUpdateVO.getCourseNotice().getBytes())
+                    .set(uploadFiles.fileName, requestUpdateVO.getCourseNotice().getOriginalFilename())
+                    .where(uploadFiles.postId.eq(requestUpdateVO.getCourseId())
+                            .and(uploadFiles.uploadFileType.eq(UploadFileType.COURSE_NOTICE_FILE)))
+                    .execute();
+        }
 
     }
 }

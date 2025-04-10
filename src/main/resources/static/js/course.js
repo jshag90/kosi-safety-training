@@ -15,3 +15,15 @@ function getCourseStatusButtonClass(courseStatus) {
     ? "btn-outline-success"
     : "btn-outline-danger";
 }
+
+function initCourseFeeFormatting(elementId) {
+  $(elementId).on("input", function () {
+    const value = $(this).val().replace(/,/g, "");
+    if (!isNaN(value) && value !== "") {
+      const formattedValue = Number(value).toLocaleString("ko-KR");
+      $(this).val(formattedValue);
+    } else {
+      $(this).val("");
+    }
+  });
+}

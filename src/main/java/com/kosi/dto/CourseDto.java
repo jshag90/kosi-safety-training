@@ -25,6 +25,8 @@ public class CourseDto {
     LocalDate applyStartDate;
     LocalDate applyEndDate;
 
+    String formattedCourseDate;
+
     String courseTimeSum;
 
     LocalTime courseStartTime;

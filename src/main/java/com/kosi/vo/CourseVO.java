@@ -49,8 +49,8 @@ public class CourseVO {
         private String endTime;
         private String applyStartDate;
         private String applyEndDate;
-        private int recruitmentCount;
-        private int writtenApplicationCount;
+        private Integer recruitmentCount;
+        private Integer writtenApplicationCount;
         private String courseLocation;
         private String courseFee;
         private String courseDescription;

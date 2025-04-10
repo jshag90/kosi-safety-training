@@ -116,7 +116,7 @@ public class CourseLectureRestController {
     }
 
     @PutMapping("/course")
-    public ResponseEntity<ResultVO<Void>> updateCourse(@ModelAttribute CourseVO.RequestUpdateVO requestUpdateVO){
+    public ResponseEntity<ResultVO<Void>> updateCourse(@ModelAttribute CourseVO.RequestUpdateVO requestUpdateVO) throws IOException {
         log.info(requestUpdateVO.toString());
         courseLectureService.updateCourse(requestUpdateVO);
 

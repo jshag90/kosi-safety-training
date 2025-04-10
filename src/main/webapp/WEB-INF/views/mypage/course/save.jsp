@@ -125,6 +125,7 @@
                     id="startDate"
                     name="startDate"
                     placeholder="교육 시작일을 선택하세요."
+                    autocomplete="off"
                     required
                   />
                 </div>
@@ -136,6 +137,7 @@
                     id="endDate"
                     name="endDate"
                     placeholder="교육 종료일을 선택하세요."
+                    autocomplete="off"
                     required
                   />
                 </div>
@@ -150,6 +152,7 @@
                     id="startTime"
                     name="startTime"
                     placeholder="교육 시작시간을 선택하세요."
+                    autocomplete="off"
                     required
                   />
                 </div>
@@ -161,6 +164,7 @@
                     id="endTime"
                     name="endTime"
                     placeholder="교육 종료시간을 선택하세요."
+                    autocomplete="off"
                     required
                   />
                 </div>
@@ -175,6 +179,7 @@
                     id="applyStartDate"
                     name="applyStartDate"
                     placeholder="신청 시작일을 선택하세요."
+                    autocomplete="off"
                     required
                   />
                 </div>
@@ -186,6 +191,7 @@
                     id="applyEndDate"
                     name="applyEndDate"
                     placeholder="신청 종료일을 선택하세요."
+                    autocomplete="off"
                     required
                   />
                 </div>
@@ -294,6 +300,7 @@
 
     <%@include file ="../../common/footer.jsp" %>
     <script src="${contextPath}/js/common.js"></script>
+    <script src="${contextPath}/js/course.js"></script>
     <script>
       const accessToken = sessionStorage.getItem("accessToken");
       const contextUrl = "${contextPath}/";
@@ -310,7 +317,7 @@
             initCourseCategorySelector();
             initDatePickers();
             initTimePickers();
-            initCourseFeeFormatting();
+            initCourseFeeFormatting("#courseFee");
           } else {
             requireAdminRoleAlert(contextUrl);
           }
@@ -394,18 +401,6 @@
         $("#endTime").timepicker(timePickerOptions);
       }
 
-      function initCourseFeeFormatting() {
-        $("#courseFee").on("input", function () {
-          const value = $(this).val().replace(/,/g, "");
-          if (!isNaN(value) && value !== "") {
-            const formattedValue = Number(value).toLocaleString("ko-KR");
-            $(this).val(formattedValue);
-          } else {
-            $(this).val("");
-          }
-        });
-      }
-
       function submitForm() {
         const form = $("#courseForm")[0];
         const formData = new FormData(form);
@@ -432,7 +427,7 @@
               icon: "success",
               confirmButtonText: "확인",
             }).then(() => {
-              location.href = contextPath + "/";
+              location.href = contextUrl;
             });
           })
           .catch((error) => {

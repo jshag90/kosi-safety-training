@@ -130,7 +130,7 @@ public class CourseLectureService {
     }
 
     @Transactional
-    public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) {
+    public void updateCourse(CourseVO.RequestUpdateVO requestUpdateVO) throws IOException {
         courseLectureDao.updateCourse(requestUpdateVO);
     }
 }
