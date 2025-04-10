@@ -27,3 +27,14 @@ function initCourseFeeFormatting(elementId) {
     }
   });
 }
+
+function hasDuplicateOrder(reorderedData) {
+  const seen = new Set();
+  for (const item of reorderedData) {
+    if (seen.has(item.newPosition)) {
+      return true;
+    }
+    seen.add(item.newPosition);
+  }
+  return false; // 중복 없음
+}

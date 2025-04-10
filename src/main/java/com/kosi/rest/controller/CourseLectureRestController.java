@@ -143,12 +143,12 @@ public class CourseLectureRestController {
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
 
-    @PostMapping("/update-order")
-    public  ResponseEntity<ResultVO<Void>>  updateLectureOrder(
+    @PutMapping("/lecture/update-order")
+    public ResponseEntity<ResultVO<Void>> updateLectureOrder(
             @RequestParam("courseId") Long courseId,
             @RequestBody List<LectureOrderDto> reorderedData) {
         log.info(reorderedData.toString());
-            courseLectureService.updateLectureOrder(courseId, reorderedData);
+        courseLectureService.updateLectureOrder(courseId, reorderedData);
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
@@ -157,6 +157,8 @@ public class CourseLectureRestController {
 
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
+    
+    //TODO 강의 저장하기
 
 
 

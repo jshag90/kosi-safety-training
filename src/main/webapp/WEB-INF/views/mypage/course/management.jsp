@@ -791,8 +791,8 @@
         console.log("저장할 순서 데이터:", reorderedData);
 
         axios
-          .post(
-            `${contextPath}/course-lecture/update-order?courseId=` +
+          .put(
+            `${contextPath}/course-lecture/lecture/update-order?courseId=` +
               selectedCourseId,
             reorderedData
           )
@@ -804,17 +804,6 @@
             console.error("순서 저장 실패:", error);
             Swal.fire("오류", "강의 순서를 저장하는 데 실패했습니다.", "error");
           });
-      }
-
-      function hasDuplicateOrder(reorderedData) {
-        const seen = new Set();
-        for (const item of reorderedData) {
-          if (seen.has(item.newPosition)) {
-            return true;
-          }
-          seen.add(item.newPosition);
-        }
-        return false; // 중복 없음
       }
     </script>
   </body>
