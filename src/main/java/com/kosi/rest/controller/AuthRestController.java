@@ -114,5 +114,17 @@ public class AuthRestController {
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @GetMapping("/check-permission")
+    public ResponseEntity<ResultVO<Boolean>> checkPermission(
+            @RequestParam("accessToken") String accessToken
+    ) {
+        boolean isRoleAdmin = tokenProvider.hasAuthority(accessToken, "ROLE_ADMIN");
+        ResultVO<Boolean> resultVO = ResultVO.<Boolean>builder().returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .data(isRoleAdmin)
+                .build();
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
 
 }

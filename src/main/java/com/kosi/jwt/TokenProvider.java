@@ -112,4 +112,23 @@ public class TokenProvider implements InitializingBean {
       }
       return false;
    }
+
+   public boolean hasAuthority(String token, String requiredAuthority) {
+      try {
+         Claims claims = Jwts
+                 .parserBuilder()
+                 .setSigningKey(key)
+                 .build()
+                 .parseClaimsJws(token)
+                 .getBody();
+
+         String authorities = claims.get(AUTHORITIES_KEY).toString();
+         return Arrays.stream(authorities.split(","))
+                 .anyMatch(auth -> auth.equals(requiredAuthority));
+      } catch (Exception e) {
+         log.error("권한 확인 중 오류 발생: {}", e.getMessage());
+         return false;
+      }
+   }
+
 }

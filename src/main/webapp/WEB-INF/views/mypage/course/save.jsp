@@ -293,24 +293,33 @@
     </div>
 
     <%@include file ="../../common/footer.jsp" %>
+    <script src="${contextPath}/js/common.js"></script>
     <script>
+      const accessToken = sessionStorage.getItem("accessToken");
+      const contextUrl = "${contextPath}/";
+
       $(document).ready(function () {
-        initCourseCategorySelector();
-        initDatePickers();
-        initTimePickers();
-        initCourseFeeFormatting();
-      });
-
-      // Function to initialize course category selector
-      function initCourseCategorySelector() {
-        const categorySelect = $("#category");
-        const apiEndpoint = "${contextPath}/course-lecture/course-category";
-        const accessToken = sessionStorage.getItem("accessToken");
-
         if (!accessToken) {
-          alert("로그인이 필요합니다. 다시 로그인해주세요.");
+          requireLoginAlert(contextUrl);
           return;
         }
+
+        const checkPermissionUrl = contextUrl + "api/check-permission";
+        checkPermission(checkPermissionUrl, function (hasPermission) {
+          if (hasPermission) {
+            initCourseCategorySelector();
+            initDatePickers();
+            initTimePickers();
+            initCourseFeeFormatting();
+          } else {
+            requireAdminRoleAlert(contextUrl);
+          }
+        });
+      });
+
+      function initCourseCategorySelector() {
+        const categorySelect = $("#category");
+        const apiEndpoint = contextUrl + "course-lecture/course-category";
 
         axios
           .get(apiEndpoint, {
@@ -319,7 +328,7 @@
             },
           })
           .then((response) => {
-            const categories = response.data.data; // Assuming the API returns an array of categories
+            const categories = response.data.data;
             categories.forEach((category) => {
               const courseName =
                 category.courseCategoryType + " - " + category.courseName;
@@ -334,18 +343,17 @@
           });
       }
 
-      // Function to initialize datepickers
       function initDatePickers() {
         const datePickerOptions = {
-          dateFormat: "yy-mm-dd", // Format the date as YYYY-MM-DD
-          changeMonth: true, // Allow changing the month
-          changeYear: true, // Allow changing the year
-          showButtonPanel: true, // Show button panel for "Today" and "Done"
-          closeText: "닫기", // Text for the close button
-          currentText: "오늘", // Text for the "Today" button
-          showAnim: "slideDown", // Animation for showing the datepicker
-          prevText: "이전", // Text for the previous month button
-          nextText: "다음", // Text for the next month button
+          dateFormat: "yy-mm-dd",
+          changeMonth: true,
+          changeYear: true,
+          showButtonPanel: true,
+          closeText: "닫기",
+          currentText: "오늘",
+          showAnim: "slideDown",
+          prevText: "이전",
+          nextText: "다음",
           monthNames: [
             "1월",
             "2월",
@@ -359,54 +367,48 @@
             "10월",
             "11월",
             "12월",
-          ], // Month names in Korean
-          dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"], // Day names in Korean
+          ],
+          dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"],
         };
 
-        // Initialize datepickers for start and end dates
         $("#startDate").datepicker(datePickerOptions);
         $("#endDate").datepicker(datePickerOptions);
 
-        // Initialize datepickers for application start and end dates
         $("#applyStartDate").datepicker(datePickerOptions);
         $("#applyEndDate").datepicker(datePickerOptions);
       }
 
-      // Function to initialize timepickers
       function initTimePickers() {
         const timePickerOptions = {
-          timeFormat: "HH:mm", // Format the time as HH:mm (24-hour format)
-          interval: 30, // Time interval in minutes
-          minTime: "00:00", // Minimum time
-          maxTime: "23:59", // Maximum time
-          startTime: "00:00", // Start time
-          dynamic: false, // Dynamically adjust the dropdown
-          dropdown: true, // Show dropdown for time selection
-          scrollbar: true, // Enable scrollbar for the dropdown
+          timeFormat: "HH:mm",
+          interval: 30,
+          minTime: "00:00",
+          maxTime: "23:59",
+          startTime: "00:00",
+          dynamic: false,
+          dropdown: true,
+          scrollbar: true,
         };
 
-        // Initialize timepickers for start and end times
         $("#startTime").timepicker(timePickerOptions);
         $("#endTime").timepicker(timePickerOptions);
       }
 
-      // Function to initialize formatting for the "교육비" field
       function initCourseFeeFormatting() {
         $("#courseFee").on("input", function () {
-          const value = $(this).val().replace(/,/g, ""); // Remove existing commas
+          const value = $(this).val().replace(/,/g, "");
           if (!isNaN(value) && value !== "") {
-            const formattedValue = Number(value).toLocaleString("ko-KR"); // Format as currency
-            $(this).val(formattedValue); // Update the input value
+            const formattedValue = Number(value).toLocaleString("ko-KR");
+            $(this).val(formattedValue);
           } else {
-            $(this).val(""); // Clear the input if invalid
+            $(this).val("");
           }
         });
       }
 
-      // Function to submit the form
       function submitForm() {
-        const form = $("#courseForm")[0]; // Select the form element
-        const formData = new FormData(form); // Create a FormData object from the form
+        const form = $("#courseForm")[0];
+        const formData = new FormData(form);
 
         const visibility = $('input[name="visibility"]:checked').val();
         console.log("Selected visibility:", visibility);
@@ -418,10 +420,10 @@
         }
 
         axios
-          .post("${contextPath}/course-lecture/course/save", formData, {
+          .post(contextUrl + "course-lecture/course/save", formData, {
             headers: {
-              "Content-Type": "multipart/form-data", // Required for file uploads
-              Authorization: "Bearer " + sessionStorage.getItem("accessToken"), // Include access token
+              "Content-Type": "multipart/form-data",
+              Authorization: "Bearer " + accessToken,
             },
           })
           .then((response) => {
@@ -430,7 +432,7 @@
               icon: "success",
               confirmButtonText: "확인",
             }).then(() => {
-              location.href = "${contextPath}/";
+              location.href = contextPath + "/";
             });
           })
           .catch((error) => {

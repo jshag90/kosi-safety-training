@@ -124,8 +124,8 @@
                 <li><a class="dropdown-item" href="#!">나의 강의실</a></li>
                 <li><a class="dropdown-item" href="#!">수강신청 내역</a></li>
                 <li><a class="dropdown-item" href="#!">수료증발급</a></li>
-                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/save">교육과정등록(관리자용)</a></li>
-                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/manage">교육과정관리(관리자용)</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/save">교육과정등록</a></li>
+                <li><a class="dropdown-item" href="${contextPath}/course-lecture/course/manage">교육과정관리</a></li>
               </ul>
             </li>
           </ul>
@@ -286,6 +286,7 @@
                           <a class="nav-link" style="color: black" href="${contextPath}/member/sign-up">회원가입</a>
                       </li>
                   `);
+                  location.href = "${contextPath}/"; // 로그아웃 후 메인 페이지로 이동
                 });
             })
             .catch(error => {
