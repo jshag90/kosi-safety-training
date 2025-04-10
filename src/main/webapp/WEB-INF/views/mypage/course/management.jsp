@@ -395,10 +395,6 @@
             ></button>
           </div>
           <div class="modal-body">
-            <button id="toggleReorder" class="btn btn-primary mb-3">
-              순서 변경
-            </button>
-            <!-- 순서 변경 버튼 추가 -->
             <table id="lectureTable" class="display" style="width: 100%">
               <thead>
                 <tr>
@@ -411,6 +407,13 @@
                 <!-- 서버에서 데이터를 가져와 동적으로 채워질 부분 -->
               </tbody>
             </table>
+            <button
+              id="saveLectureOrder"
+              class="btn btn-primary mt-3"
+              onclick="saveLectureOrder()"
+            >
+              순서 저장
+            </button>
           </div>
           <div class="modal-footer">
             <button
@@ -428,6 +431,8 @@
     <%@include file ="../../common/footer.jsp" %>
     <script src="${contextPath}/js/course.js"></script>
     <script>
+      var selectedCourseId;
+
       $(document).ready(function () {
         initCourseTable();
         initCourseFeeFormatting("#courseFee");
@@ -696,6 +701,7 @@
         }
       }
 
+      ///////////////////////////////////////////////////////////강의 관련////////////////////////////////////////////////////////
       function initLectureList(courseId) {
         $("#lectureManagementModal").modal("show");
 
@@ -725,13 +731,24 @@
             },
             serverSide: true, // 서버 사이드 처리 활성화
             processing: true, // 로딩 표시 활성화
-            ordering: false,
-            searching: false,
-            rowReorder: false, // 기본적으로 Row Reorder 비활성화
+            ordering: false, // 정렬 비활성화
+            searching: false, // 검색 비활성화
             columns: [
               { data: "lectureId", title: "강의 ID" },
               { data: "title", title: "강의명" },
-              { data: "lectureOrder", title: "강의순서" },
+              {
+                data: "lectureOrder",
+                title: "강의순서",
+                render: function (data, type, row) {
+                  return (
+                    "<input type='number' class='form-control lecture-order-input' value=" +
+                    row.lectureOrder +
+                    " data-lecture-id=" +
+                    row.lectureId +
+                    " min='1' />"
+                  );
+                },
+              },
             ],
             language: {
               info: "총 _TOTAL_개의 강의 중 _START_부터 _END_까지 표시",
@@ -746,50 +763,58 @@
             },
           });
 
-          // 순서 변경 버튼 클릭 이벤트 처리
-          let reorderEnabled = false;
-          $("#toggleReorder").on("click", function () {
-            reorderEnabled = !reorderEnabled;
-
-            if (reorderEnabled) {
-              lectureTable.rowReorder.enable(); // Row Reorder 활성화
-              $(this).text("순서 변경 완료");
-            } else {
-              lectureTable.rowReorder.disable(); // Row Reorder 비활성화
-              $(this).text("순서 변경");
-            }
-          });
-
-          // 순서 변경 이벤트 처리
-          $("#lectureTable").on("row-reorder", function (e, details) {
-            const reorderedData = details.map((item) => ({
-              lectureId: item.node.querySelector("td:first-child").innerText,
-              newPosition: item.newPosition,
-            }));
-
-            console.log("순서 변경된 데이터:", reorderedData);
-
-            // 서버로 순서 변경 요청
-            axios
-              .post(`${contextPath}/course-lecture/update-order`, reorderedData)
-              .then((response) => {
-                Swal.fire("성공", "강의 순서가 변경되었습니다.", "success");
-              })
-              .catch((error) => {
-                console.error("순서 변경 실패:", error);
-                Swal.fire(
-                  "오류",
-                  "강의 순서를 변경하는 데 실패했습니다.",
-                  "error"
-                );
-              });
-          });
+          selectedCourseId = courseId; // 선택한 교육과정 ID 저장
         } else {
           const lectureTable = $("#lectureTable").DataTable();
           lectureTable.ajax
             .url(`${contextPath}/course-lecture/lectures?courseId=${courseId}`)
             .load();
         }
+      }
+
+      function saveLectureOrder(courseId) {
+        const reorderedData = [];
+        $(".lecture-order-input").each(function () {
+          const lectureId = $(this).data("lecture-id");
+          const newOrder = $(this).val();
+          reorderedData.push({
+            lectureId: lectureId,
+            newPosition: newOrder,
+          });
+        });
+
+        if (hasDuplicateOrder(reorderedData)) {
+          Swal.fire("오류", "강의 순서에 중복된 값이 있습니다.", "error");
+          return;
+        }
+
+        console.log("저장할 순서 데이터:", reorderedData);
+
+        axios
+          .post(
+            `${contextPath}/course-lecture/update-order?courseId=` +
+              selectedCourseId,
+            reorderedData
+          )
+          .then((response) => {
+            Swal.fire("성공", "강의 순서가 저장되었습니다.", "success");
+            $("#lectureTable").DataTable().ajax.reload(); // 테이블 데이터 갱신
+          })
+          .catch((error) => {
+            console.error("순서 저장 실패:", error);
+            Swal.fire("오류", "강의 순서를 저장하는 데 실패했습니다.", "error");
+          });
+      }
+
+      function hasDuplicateOrder(reorderedData) {
+        const seen = new Set();
+        for (const item of reorderedData) {
+          if (seen.has(item.newPosition)) {
+            return true;
+          }
+          seen.add(item.newPosition);
+        }
+        return false; // 중복 없음
       }
     </script>
   </body>

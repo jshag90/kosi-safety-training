@@ -1,9 +1,6 @@
 package com.kosi.rest.controller;
 
-import com.kosi.dto.CourseCategoryDto;
-import com.kosi.dto.CourseDto;
-import com.kosi.dto.LectureDto;
-import com.kosi.dto.ListResp;
+import com.kosi.dto.*;
 import com.kosi.service.CourseLectureService;
 import com.kosi.util.CourseCategory;
 import com.kosi.util.CourseCategoryType;
@@ -141,6 +138,21 @@ public class CourseLectureRestController {
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
                 .msg(ErrorCode.SUCCESS.getErrorMsg())
                 .data(lectureDtoList)
+                .build();
+
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @PostMapping("/update-order")
+    public  ResponseEntity<ResultVO<Void>>  updateLectureOrder(
+            @RequestParam("courseId") Long courseId,
+            @RequestBody List<LectureOrderDto> reorderedData) {
+        log.info(reorderedData.toString());
+            courseLectureService.updateLectureOrder(courseId, reorderedData);
+
+        ResultVO<Void> resultVO = ResultVO.<Void>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
                 .build();
 
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
