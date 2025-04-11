@@ -29,12 +29,13 @@ function initCourseFeeFormatting(elementId) {
 }
 
 function hasDuplicateOrder(reorderedData) {
+  console.log(reorderedData);
   const seen = new Set();
   for (const item of reorderedData) {
-    if (seen.has(item.newPosition)) {
+    if (seen.has(item.reOrderNumber)) {
       return true;
     }
-    seen.add(item.newPosition);
+    seen.add(item.reOrderNumber);
   }
   return false; // 중복 없음
 }

@@ -3,7 +3,7 @@ package com.kosi.dao;
 import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
 import com.kosi.dto.LectureDto;
-import com.kosi.dto.LectureOrderDto;
+import com.kosi.vo.LectureOrderVO;
 import com.kosi.entity.Course;
 import com.kosi.entity.UploadFiles;
 import com.kosi.util.*;
@@ -310,11 +310,11 @@ public class CourseLectureDao {
                 .fetchResults();
     }
 
-    public void updateLectureOrder(Long courseId, List<LectureOrderDto> lectureOrderDtoList) {
-        for (LectureOrderDto lectureOrderDto : lectureOrderDtoList) {
+    public void updateLectureOrder(Long courseId, List<LectureOrderVO> lectureOrderVOList) {
+        for (LectureOrderVO lectureOrderVo : lectureOrderVOList) {
             jpaQueryFactory.update(lecture)
-                    .set(lecture.lectureOrder, lectureOrderDto.getNewPosition())
-                    .where(lecture.course.courseId.eq(courseId).and(lecture.lectureId.eq(lectureOrderDto.getLectureId())))
+                    .set(lecture.lectureOrder, lectureOrderVo.getReOrderNumber())
+                    .where(lecture.course.courseId.eq(courseId).and(lecture.lectureId.eq(lectureOrderVo.getLectureId())))
                     .execute();
         }
     }

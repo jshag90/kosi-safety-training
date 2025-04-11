@@ -6,8 +6,8 @@ import com.kosi.util.CourseCategory;
 import com.kosi.util.CourseCategoryType;
 import com.kosi.util.ErrorCode;
 import com.kosi.vo.CourseVO;
+import com.kosi.vo.LectureOrderVO;
 import com.kosi.vo.ResultVO;
-import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -146,9 +146,9 @@ public class CourseLectureRestController {
     @PutMapping("/lecture/update-order")
     public ResponseEntity<ResultVO<Void>> updateLectureOrder(
             @RequestParam("courseId") Long courseId,
-            @RequestBody List<LectureOrderDto> reorderedData) {
-        log.info(reorderedData.toString());
-        courseLectureService.updateLectureOrder(courseId, reorderedData);
+            @RequestBody List<LectureOrderVO> lectureOrderVOList) {
+        log.info(lectureOrderVOList.toString());
+        courseLectureService.updateLectureOrder(courseId, lectureOrderVOList);
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())

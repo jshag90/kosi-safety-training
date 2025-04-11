@@ -776,10 +776,10 @@
         const reorderedData = [];
         $(".lecture-order-input").each(function () {
           const lectureId = $(this).data("lecture-id");
-          const newOrder = $(this).val();
+          const reOrderNumber = $(this).val();
           reorderedData.push({
             lectureId: lectureId,
-            newPosition: newOrder,
+            reOrderNumber: reOrderNumber,
           });
         });
 

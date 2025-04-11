@@ -1,4 +1,4 @@
-package com.kosi.dto;
+package com.kosi.vo;
 
 import lombok.*;
 
@@ -8,8 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @ToString
-public class LectureOrderDto {
+public class LectureOrderVO {
 
     private Long lectureId;
-    private Integer newPosition;
+    private Integer reOrderNumber;
+
 }
