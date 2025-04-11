@@ -395,6 +395,46 @@
             ></button>
           </div>
           <div class="modal-body">
+            <div class="row align-items-center mb-3">
+              <form id="saveLectureForm" class="row g-2">
+                <!-- 강의명 입력 -->
+                <div class="col-md-5">
+                  <label for="title" class="form-label">강의명</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                    placeholder="강의명을 입력하세요."
+                  />
+                </div>
+
+                <!-- 동영상 등록 -->
+                <div class="col-md-5">
+                  <label for="video" class="form-label">동영상 등록</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="video"
+                    name="video"
+                    accept="video/*"
+                  />
+                </div>
+
+                <!-- 강의추가 버튼 -->
+                <div class="col-md-2 text-end">
+                  <label for="saveLectureBtn" class="form-label">&nbsp;</label>
+                  <button
+                    id="saveLectureBtn"
+                    class="btn btn-primary mt-0"
+                    onclick="saveLecture(event)"
+                  >
+                    <i class="fas fa-plus"></i> 강의추가
+                  </button>
+                </div>
+              </form>
+            </div>
+
             <table id="lectureTable" class="display" style="width: 100%">
               <thead>
                 <tr>
@@ -407,13 +447,19 @@
                 <!-- 서버에서 데이터를 가져와 동적으로 채워질 부분 -->
               </tbody>
             </table>
-            <button
-              id="saveLectureOrder"
-              class="btn btn-primary mt-3"
-              onclick="saveLectureOrder()"
-            >
-              순서 저장
-            </button>
+
+            <div class="row align-items-end mb-3">
+              <!-- 강의순서 수정 버튼 -->
+              <div class="col-md-3 ms-auto text-end">
+                <button
+                  id="saveLectureOrder"
+                  class="btn btn-primary mt-3"
+                  onclick="saveLectureOrder()"
+                >
+                  <i class="fas fa-pencil"></i> 강의순서변경
+                </button>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -511,6 +557,7 @@
       }
 
       function updateCourseChanges() {
+        event.preventDefault();
         const form = $("#editCourseForm")[0];
         const formData = new FormData(form);
 
@@ -803,6 +850,36 @@
           .catch((error) => {
             console.error("순서 저장 실패:", error);
             Swal.fire("오류", "강의 순서를 저장하는 데 실패했습니다.", "error");
+          });
+      }
+
+      function saveLecture(event) {
+        event.preventDefault();
+
+        const form = $("#saveLectureForm")[0];
+        const formData = new FormData(form);
+
+        formData.append("courseId", selectedCourseId);
+
+        console.log("TEST :", Array.from(formData.entries())); // formData 내용을 확인
+
+        // 서버로 요청 보내기
+        axios
+          .post(`${contextPath}/course-lecture/lecture`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+            },
+          })
+          .then(function (response) {
+            Swal.fire("성공", "강의가 성공적으로 추가되었습니다.", "success");
+            $("#lectureTable").DataTable().ajax.reload();
+            $("#lectureTitle").val("");
+            $("#lectureVideo").val("");
+          })
+          .catch(function (error) {
+            console.error("강의 추가 실패:", error);
+            Swal.fire("오류", "강의를 추가하는 데 실패했습니다.", "error");
           });
       }
     </script>

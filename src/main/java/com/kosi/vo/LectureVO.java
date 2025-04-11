@@ -1,6 +1,7 @@
 package com.kosi.vo;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 public class LectureVO {
 
@@ -13,6 +14,7 @@ public class LectureVO {
     public static class RequestSave{
         Long courseId;
         String title;
+        MultipartFile video;
     }
 
     @Getter

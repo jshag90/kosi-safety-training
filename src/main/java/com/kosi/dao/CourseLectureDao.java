@@ -4,6 +4,7 @@ import com.kosi.dto.CourseCategoryDto;
 import com.kosi.dto.CourseDto;
 import com.kosi.dto.LectureDto;
 import com.kosi.entity.Course;
+import com.kosi.entity.Lecture;
 import com.kosi.entity.UploadFiles;
 import com.kosi.util.*;
 import com.kosi.vo.CourseVO;
@@ -317,5 +318,24 @@ public class CourseLectureDao {
                     .where(lecture.course.courseId.eq(courseId).and(lecture.lectureId.eq(lectureOrderVo.getLectureId())))
                     .execute();
         }
+    }
+
+    public void saveLecture(LectureVO.RequestSave requestSave) {
+        Course findByIdCourse = jpaQueryFactory.selectFrom(course).where(course.courseId.eq(requestSave.getCourseId())).fetchOne();
+
+        LectureDto lectureOrder = jpaQueryFactory.select(Projections.bean(LectureDto.class, lecture.lectureOrder))
+                                                .from(lecture)
+                                                .orderBy(lecture.lectureOrder.desc())
+                                                .limit(1)
+                                                .fetchOne();
+
+        Lecture saveLecture = Lecture.builder()
+                .title(requestSave.getTitle())
+                .course(findByIdCourse)
+                .createdAt(LocalDateTime.now())
+                .lectureOrder(lectureOrder==null?1:lectureOrder.getLectureOrder()+1)
+                .build();
+
+        entityManager.persist(saveLecture);
     }
 }

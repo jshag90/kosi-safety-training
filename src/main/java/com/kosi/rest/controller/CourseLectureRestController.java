@@ -158,9 +158,10 @@ public class CourseLectureRestController {
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
 
-    //TODO 강의 저장하기
     @PostMapping("/lecture")
-    public ResponseEntity<ResultVO<Void>> addLecture(@RequestBody LectureVO.RequestSave requestSave) {
+    public ResponseEntity<ResultVO<Void>> saveLecture(@ModelAttribute LectureVO.RequestSave requestSave) {
+
+        courseLectureService.saveLecture(requestSave);
 
         ResultVO<Void> resultVO = ResultVO.<Void>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
@@ -168,7 +169,6 @@ public class CourseLectureRestController {
                 .build();
 
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
-
     }
 
 

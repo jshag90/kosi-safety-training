@@ -148,4 +148,9 @@ public class CourseLectureService {
     public void updateLectureOrder(Long courseId, List<LectureVO.OrderVO> lectureOrderVOList) {
         courseLectureDao.updateLectureOrder(courseId, lectureOrderVOList);
     }
+
+    @Transactional
+    public void saveLecture(LectureVO.RequestSave requestSave) {
+        courseLectureDao.saveLecture(requestSave);
+    }
 }
