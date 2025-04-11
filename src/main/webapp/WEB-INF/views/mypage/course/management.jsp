@@ -750,73 +750,76 @@
 
       ///////////////////////////////////////////////////////////강의 관련////////////////////////////////////////////////////////
       function initLectureList(courseId) {
+        selectedCourseId = courseId; // 선택한 교육과정 ID 저장
+
         $("#lectureManagementModal").modal("show");
 
-        if (!$.fn.DataTable.isDataTable("#lectureTable")) {
-          const lectureTable = $("#lectureTable").DataTable({
-            ajax: {
-              url: `${contextPath}/course-lecture/lectures`,
-              type: "GET",
-              data: function (d) {
-                d.courseId = courseId; // courseId를 요청에 추가
-                d.page = d.start / d.length + 1; // 현재 페이지 번호 계산
-                d.pageSize = d.length; // 한 페이지에 표시할 데이터 수
-              },
-              dataSrc: function (json) {
-                if (json.returnCode !== 0) {
-                  Swal.fire(
-                    "오류",
-                    "강의 데이터를 불러오는 데 실패했습니다.",
-                    "error"
-                  );
-                  return [];
-                }
-                json.recordsTotal = json.data.total; // 전체 데이터 수
-                json.recordsFiltered = json.data.total; // 필터링된 데이터 수
-                return json.data.list; // 실제 데이터 반환
-              },
-            },
-            serverSide: true, // 서버 사이드 처리 활성화
-            processing: true, // 로딩 표시 활성화
-            ordering: false, // 정렬 비활성화
-            searching: false, // 검색 비활성화
-            columns: [
-              { data: "lectureId", title: "강의 ID" },
-              { data: "title", title: "강의명" },
-              {
-                data: "lectureOrder",
-                title: "강의순서",
-                render: function (data, type, row) {
-                  return (
-                    "<input type='number' class='form-control lecture-order-input' value=" +
-                    row.lectureOrder +
-                    " data-lecture-id=" +
-                    row.lectureId +
-                    " min='1' />"
-                  );
-                },
-              },
-            ],
-            language: {
-              info: "총 _TOTAL_개의 강의 중 _START_부터 _END_까지 표시",
-              infoEmpty: "표시할 데이터가 없습니다.",
-              infoFiltered: "(총 _MAX_개의 데이터에서 필터링됨)",
-              paginate: {
-                first: "처음",
-                last: "마지막",
-                next: "다음",
-                previous: "이전",
-              },
-            },
-          });
+        const $lectureTable = $("#lectureTable");
 
-          selectedCourseId = courseId; // 선택한 교육과정 ID 저장
-        } else {
-          const lectureTable = $("#lectureTable").DataTable();
-          lectureTable.ajax
-            .url(`${contextPath}/course-lecture/lectures?courseId=${courseId}`)
-            .load();
+        if ($.fn.DataTable.isDataTable($lectureTable)) {
+          $lectureTable.DataTable().clear().destroy();
         }
+
+        // DataTable 다시 초기화
+        $lectureTable.DataTable({
+          ajax: {
+            url: `${contextPath}/course-lecture/lectures`,
+            type: "GET",
+            data: function (d) {
+              d.courseId = selectedCourseId;
+              d.page = d.start / d.length + 1;
+              d.pageSize = d.length;
+            },
+            error: function (xhr, error, thrown) {
+              console.error("Ajax error:", error);
+            },
+            dataSrc: function (json) {
+              if (json.returnCode !== 0) {
+                Swal.fire(
+                  "오류",
+                  "강의 데이터를 불러오는 데 실패했습니다.",
+                  "error"
+                );
+                return [];
+              }
+              json.recordsTotal = json.data.total;
+              json.recordsFiltered = json.data.total;
+              return json.data.list;
+            },
+          },
+          serverSide: true,
+          processing: true,
+          ordering: false,
+          searching: false,
+          columns: [
+            { data: "lectureId", title: "강의 ID" },
+            { data: "title", title: "강의명" },
+            {
+              data: "lectureOrder",
+              title: "강의순서",
+              render: function (data, type, row) {
+                return (
+                  "<input type='number' class='form-control lecture-order-input' value=" +
+                  row.lectureOrder +
+                  " data-lecture-id=" +
+                  row.lectureId +
+                  " min='1' />"
+                );
+              },
+            },
+          ],
+          language: {
+            info: "총 _TOTAL_개의 강의 중 _START_부터 _END_까지 표시",
+            infoEmpty: "표시할 데이터가 없습니다.",
+            infoFiltered: "(총 _MAX_개의 데이터에서 필터링됨)",
+            paginate: {
+              first: "처음",
+              last: "마지막",
+              next: "다음",
+              previous: "이전",
+            },
+          },
+        });
       }
 
       function saveLectureOrder(courseId) {
