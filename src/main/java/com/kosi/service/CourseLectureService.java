@@ -145,7 +145,7 @@ public class CourseLectureService {
     }
 
     @Transactional
-    public void updateLectureOrder(Long courseId, List<LectureOrderVO> reorderedData) {
-        courseLectureDao.updateLectureOrder(courseId, reorderedData);
+    public void updateLectureOrder(Long courseId, List<LectureOrderVO> lectureOrderVOList) {
+        courseLectureDao.updateLectureOrder(courseId, lectureOrderVOList);
     }
 }
