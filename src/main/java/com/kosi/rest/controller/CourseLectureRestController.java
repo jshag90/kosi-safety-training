@@ -6,7 +6,7 @@ import com.kosi.util.CourseCategory;
 import com.kosi.util.CourseCategoryType;
 import com.kosi.util.ErrorCode;
 import com.kosi.vo.CourseVO;
-import com.kosi.vo.LectureOrderVO;
+import com.kosi.vo.LectureVO;
 import com.kosi.vo.ResultVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +89,7 @@ public class CourseLectureRestController {
     }
 
     @DeleteMapping("/courses")
-    public ResponseEntity<ResultVO<Void>> deleteCourseById(@RequestParam("courseId") Long courseId){
+    public ResponseEntity<ResultVO<Void>> deleteCourseById(@RequestParam("courseId") Long courseId) {
         courseLectureService.deleteCourseById(courseId);
         ResultVO<Void> resultVO = ResultVO.<Void>builder()
                 .returnCode(ErrorCode.SUCCESS.getErrorCode())
@@ -146,7 +146,7 @@ public class CourseLectureRestController {
     @PutMapping("/lecture/update-order")
     public ResponseEntity<ResultVO<Void>> updateLectureOrder(
             @RequestParam("courseId") Long courseId,
-            @RequestBody List<LectureOrderVO> lectureOrderVOList) {
+            @RequestBody List<LectureVO.OrderVO> lectureOrderVOList) {
         log.info(lectureOrderVOList.toString());
         courseLectureService.updateLectureOrder(courseId, lectureOrderVOList);
 
@@ -157,9 +157,19 @@ public class CourseLectureRestController {
 
         return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
     }
-    
-    //TODO 강의 저장하기
 
+    //TODO 강의 저장하기
+    @PostMapping("/lecture")
+    public ResponseEntity<ResultVO<Void>> addLecture(@RequestBody LectureVO.RequestSave requestSave) {
+
+        ResultVO<Void> resultVO = ResultVO.<Void>builder()
+                .returnCode(ErrorCode.SUCCESS.getErrorCode())
+                .msg(ErrorCode.SUCCESS.getErrorMsg())
+                .build();
+
+        return new ResponseEntity<>(resultVO, new HttpHeaders(), HttpStatus.OK);
+
+    }
 
 
 }

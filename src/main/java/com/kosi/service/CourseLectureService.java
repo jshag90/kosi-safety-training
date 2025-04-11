@@ -4,7 +4,7 @@ import com.kosi.dao.CourseLectureDao;
 import com.kosi.dto.*;
 import com.kosi.util.*;
 import com.kosi.vo.CourseVO;
-import com.kosi.vo.LectureOrderVO;
+import com.kosi.vo.LectureVO;
 import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -145,7 +145,7 @@ public class CourseLectureService {
     }
 
     @Transactional
-    public void updateLectureOrder(Long courseId, List<LectureOrderVO> lectureOrderVOList) {
+    public void updateLectureOrder(Long courseId, List<LectureVO.OrderVO> lectureOrderVOList) {
         courseLectureDao.updateLectureOrder(courseId, lectureOrderVOList);
     }
 }
